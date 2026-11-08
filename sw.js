@@ -3,7 +3,7 @@
 // - Bibliotecas do Firebase: guardadas para o app abrir mesmo sem internet.
 // - Fotos do Cloudinary: guardadas depois da 1ª vez que aparecem.
 // - Banco de dados (Firestore) e login: não passam por aqui (o Firebase cuida disso).
-const VERSAO = 'estoque-sm-v1';
+const VERSAO = 'estoque-sm-v2';
 const CACHE_APP = VERSAO + '-app';
 const CACHE_LIBS = 'estoque-sm-libs';
 const CACHE_FOTOS = 'estoque-sm-fotos';
@@ -67,4 +67,17 @@ self.addEventListener('fetch', e => {
       return r;
     })());
   }
+});
+
+// Toque na notificação de erro → abre (ou traz para a frente) o app na aba Erros
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const aba = (e.notification.data && e.notification.data.aba) || 'erros';
+  e.waitUntil((async () => {
+    const janelas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of janelas) {
+      if (c.url.startsWith(self.registration.scope) && 'focus' in c) { c.postMessage({ abrir: aba }); return c.focus(); }
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(self.registration.scope + '?aba=' + aba);
+  })());
 });

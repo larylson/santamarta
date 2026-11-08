@@ -1616,6 +1616,10 @@ PASSOS PARA RODAR NO GITHUB PAGES:
 
     .diag-box { font-size:13px; line-height:1.6; background:var(--bege); border-radius:10px; padding:10px 12px; }
     .diag-lista { margin-top:8px; padding-top:8px; border-top:1px solid rgba(0,0,0,.08); }
+    .erro-veiculo-faixa { background:#fff3e0; border:1.5px solid #ffcc80; color:#5d3a00; border-radius:12px; padding:10px 12px; margin-bottom:12px; font-size:13px; }
+    .erro-veiculo-tag { display:inline-block; margin:6px 0 2px; padding:3px 9px; border-radius:999px; background:#fff3e0; color:#8a4b00; font-size:12px; font-weight:700; }
+    html.tema-escuro .erro-veiculo-faixa { background:#2b2112; border-color:#6b4a14; color:#ffd9a0; }
+    html.tema-escuro .erro-veiculo-tag { background:#3a2a10; color:#ffcf8a; }
     .diverg-linha { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid rgba(0,0,0,.06); cursor:pointer; font-size:13px; line-height:1.45; -webkit-tap-highlight-color:transparent; }
     .diverg-caixa { flex:0 0 auto; width:22px; height:22px; margin-top:1px; border-radius:6px; border:2px solid #9aa79a; background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; color:#fff; }
     .diverg-linha.marcado .diverg-caixa { background:#2e7d32; border-color:#2e7d32; }
@@ -1996,6 +2000,16 @@ PASSOS PARA RODAR NO GITHUB PAGES:
       <div id="lista-usuarios"></div>
     </div>
 
+    <div class="card" id="config-veiculos-card" style="margin-top:12px;display:none">
+      <div class="card-titulo">🚚 Veículos</div>
+      <p style="font-size:13px;color:var(--texto-suave);margin-bottom:10px">Usados na aba ⚠️ Erros. O celular de cada chefe de notas é ligado a um veículo pelo botão <b>🚚 Definir veículo</b> no usuário — o alerta de um erro chega só no celular daquele veículo.</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="input-novo-veiculo" placeholder="Ex: Caminhão 03 — ABC-1234" maxlength="40" style="flex:1;min-width:0;padding:10px 14px;font-size:14px;border-radius:8px;border:1.5px solid #d0c9bb" onkeydown="if(event.key==='Enter')adicionarVeiculo()" />
+        <button onclick="adicionarVeiculo()" style="background:var(--verde-escuro);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer">+ Add</button>
+      </div>
+      <div id="lista-veiculos"></div>
+    </div>
+
     <div class="card" id="config-abas-card" style="margin-top:12px;display:none">
       <div class="card-titulo">🧩 Abas do app</div>
       <p style="font-size:13px;color:var(--texto-suave);margin-bottom:12px">Abas desligadas somem para <b>todos</b>, mas nada é apagado. Marque para ligar de novo.</p>
@@ -2241,6 +2255,7 @@ PASSOS PARA RODAR NO GITHUB PAGES:
   <div style="padding:16px">
 
     <!-- Resumo -->
+    <div id="erro-meu-veiculo"></div>
     <div class="erro-resumo" id="erro-resumo"></div>
 
     <!-- Filtros -->
@@ -2262,6 +2277,13 @@ PASSOS PARA RODAR NO GITHUB PAGES:
       <div class="campo-grupo" style="margin-bottom:10px">
         <label>📋 Descrição do Erro / Carga Faltando</label>
         <textarea id="erro-descricao-input" placeholder="Ex: Faltando 5 caixas de Porcelanato 82x82 Lote 058..." rows="3" style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:14px;border-radius:8px;border:1.5px solid #d0c9bb;font-family:inherit;resize:vertical"></textarea>
+      </div>
+
+      <div class="campo-grupo" style="margin-bottom:10px">
+        <label>🚚 Veículo <span style="font-weight:400;text-transform:none">(o alerta vai só para o celular dele)</span></label>
+        <select id="erro-veiculo" style="width:100%;padding:11px 14px;font-size:14px;border-radius:8px;border:1.5px solid #d0c9bb;background:#fff">
+          <option value="">— Nenhum —</option>
+        </select>
       </div>
 
       <div class="linha-2" style="margin-bottom:0">
@@ -4935,7 +4957,7 @@ async function executarDiagnostico() {
       return `<div class="diag-lista"><b>⚡ Tempo real neste aparelho</b><br><span style="font-size:12px">${linhas.join('<br>')}</span></div>`;
     })()}
     ${r.aparelhos ? `<div class="diag-lista"><b>📱 Aparelhos nesta conta</b> <span style="font-size:11px;opacity:.7">(último acesso)</span><br>
-      ${r.aparelhos.map(a => { const antigo = a.versao !== r.versao; return `<div style="font-size:12px;margin-top:3px">${a.eu ? '👉 ' : ''}<b>${escMapa(a.nome || '?')}</b>${a.usuario ? ' · ' + escMapa(a.usuario) : ''} ·
+      ${r.aparelhos.map(a => { const antigo = a.versao !== r.versao; return `<div style="font-size:12px;margin-top:3px">${a.eu ? '👉 ' : ''}<b>${escMapa(a.nome || '?')}</b>${a.usuario ? ' · ' + escMapa(a.usuario) : ''}${a.veiculo ? ` · 🚚 ${escMapa(a.veiculo)}${a.alertas === 'granted' ? ' 🔔' : ' <span style="color:#c0392b">🔕</span>'}` : ''} ·
         <span style="${antigo ? 'color:#c0392b;font-weight:800' : ''}">${escMapa(a.versao || '?')}${antigo ? ' ⚠️ versão diferente' : ''}</span> ·
         ${a.visto ? new Date(a.visto).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '?'} · ${a.pisos ?? '?'} pisos${a.pendentes ? ` · <span style="color:#b9770e">${a.pendentes} pendente(s)</span>` : ''}${a.tempoReal && a.tempoReal !== 'ligado' ? ` · <span style="color:#c0392b">tempo real: ${escMapa(a.tempoReal)}</span>` : ''}</div>`; }).join('')}
       <div style="font-size:11px;opacity:.75;margin-top:4px">Aparelho com versão antiga não recebe as mudanças — feche e abra o app nele. Aparelho que não aparece aqui pode estar em outra conta Google.</div></div>` : ''}
@@ -5931,6 +5953,7 @@ function exportarQuebrasCSV() {
 // ===================== ERROS DE CARREGAMENTO =====================
 const CHAVE_ERROS = 'estoque_erros_v1';
 let filtroErroAtual = 'todos';
+let filtroErroVeiculo = 'meu'; // no celular do chefe de notas: mostra só os erros do veículo dele
 
 function carregarErros() {
   try { return JSON.parse(localStorage.getItem(CHAVE_ERROS)) || []; }
@@ -5947,12 +5970,13 @@ function adicionarErro() {
   const descricao = document.getElementById('erro-descricao-input')?.value.trim();
   const responsavel = document.getElementById('erro-responsavel')?.value || '';
   const data = document.getElementById('erro-data')?.value || new Date().toLocaleDateString('pt-BR');
+  const veiculo = veiculoPorId(document.getElementById('erro-veiculo')?.value || '');
 
   if (!numero) { toast('⚠️ Informe o número da carga.', true); return; }
   if (!descricao) { toast('⚠️ Descreva o erro.', true); return; }
 
   const lista = carregarErros();
-  lista.unshift({
+  const novo = {
     id: `${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
     numero,
     descricao,
@@ -5960,15 +5984,19 @@ function adicionarErro() {
     data: data || new Date().toLocaleDateString('pt-BR'),
     status: 'pendente',
     criadoEm: new Date().toLocaleString('pt-BR')
-  });
+  };
+  if (veiculo) { novo.veiculo = veiculo.id; novo.veiculoNome = veiculo.nome; }
+  lista.unshift(novo);
+  marcarErroVisto(novo); // quem registrou não é alertado
   salvarErros(lista);
 
   document.getElementById('erro-numero-input').value = '';
   document.getElementById('erro-descricao-input').value = '';
   document.getElementById('erro-responsavel').value = '';
+  if (document.getElementById('erro-veiculo')) document.getElementById('erro-veiculo').value = '';
 
   renderErros();
-  toast('⚠️ Erro registrado!');
+  toast(veiculo ? `⚠️ Erro registrado — alerta enviado para o celular do ${veiculo.nome}` : '⚠️ Erro registrado!');
 }
 
 function toggleStatusErro(id) {
@@ -6028,6 +6056,25 @@ function renderErros() {
       usuarios.map(u => `<option value="${u.nome}" ${atual===u.nome?'selected':''}>${u.nome}</option>`).join('');
   }
 
+  // Veículos
+  const selV = document.getElementById('erro-veiculo');
+  if (selV) {
+    const atualV = selV.value, vs = carregarVeiculos();
+    selV.innerHTML = `<option value="">${vs.length ? '— Nenhum —' : '— nenhum veículo cadastrado (Config → 🚚 Veículos) —'}</option>` + vs.map(v => `<option value="${v.id}" ${atualV === v.id ? 'selected' : ''}>🚚 ${escMapa(v.nome)}</option>`).join('');
+  }
+  const meuV = veiculoDoAparelho();
+  const faixa = document.getElementById('erro-meu-veiculo');
+  if (faixa) {
+    const perm = ('Notification' in window) ? Notification.permission : 'indisponivel';
+    faixa.innerHTML = meuV ? `<div class="erro-veiculo-faixa">
+        <div>🚚 Este celular recebe os alertas do <b>${escMapa(meuV.nome)}</b></div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${perm === 'granted' ? '<span>🔔 Notificações ligadas</span>' : perm === 'denied' ? '<span style="color:#c0392b">🔕 Notificações bloqueadas — libere nas configurações do celular</span>' : perm === 'indisponivel' ? '<span>🔕 Este navegador não tem notificações</span>' : '<button onclick="pedirPermissaoNotificacao()" class="erro-filtro-btn ativo">🔔 Ativar notificações</button>'}
+          <button class="erro-filtro-btn ${filtroErroVeiculo === 'meu' ? 'ativo' : ''}" onclick="filtroErroVeiculo='meu';renderErros()">Só do meu veículo</button>
+          <button class="erro-filtro-btn ${filtroErroVeiculo === 'todos' ? 'ativo' : ''}" onclick="filtroErroVeiculo='todos';renderErros()">Todos</button>
+        </div></div>` : '';
+  }
+
   // Data padrão hoje
   const dataInput = document.getElementById('erro-data');
   if (dataInput && !dataInput.value) {
@@ -6036,6 +6083,7 @@ function renderErros() {
   }
 
   let lista = carregarErros();
+  if (meuV && filtroErroVeiculo === 'meu') lista = lista.filter(e => e.veiculo === meuV.id);
   const total = lista.length;
   const pendentes = lista.filter(e => e.status === 'pendente').length;
   const resolvidos = lista.filter(e => e.status === 'resolvido').length;
@@ -6079,6 +6127,7 @@ function renderErros() {
         </button>
       </div>
       <div class="erro-descricao">${e.descricao}</div>
+      ${e.veiculo ? `<div class="erro-veiculo-tag">🚚 ${escMapa((veiculoPorId(e.veiculo) || {}).nome || e.veiculoNome || 'veículo')}</div>` : ''}
       <div class="erro-detalhe">
         ${e.responsavel ? `👤 ${e.responsavel} · ` : ''}📅 ${e.data} · 🕐 ${e.criadoEm}
         ${e.resolvidoEm ? `<br>✅ Resolvido em: ${e.resolvidoEm}` : ''}
@@ -6089,6 +6138,186 @@ function renderErros() {
     </div>
   `).join('');
 }
+
+
+// ===================== VEÍCULOS · CHEFES DE NOTAS · ALERTA DE ERRO NO CELULAR DO VEÍCULO =====================
+// Os veículos ficam na config (sincroniza para todos). Cada celular de chefe de notas fica ligado a UM veículo
+// (gravado só naquele celular, definido por um mestre/ADM). Erro novo com veículo X → só o celular do X é alertado.
+function carregarVeiculos() { const v = carregarConfigApp().veiculos; return Array.isArray(v) ? v.filter(x => x && x.id) : []; }
+function salvarVeiculos(lista) { const c = carregarConfigApp(); c.veiculos = lista; salvarConfigApp(c); }
+function veiculoPorId(id) { return carregarVeiculos().find(v => v.id === id) || null; }
+const CHAVE_VEICULO_APARELHO = 'estoque_veiculo_aparelho';
+function veiculoDoAparelho() {
+  try { const v = JSON.parse(localStorage.getItem(CHAVE_VEICULO_APARELHO) || 'null'); if (!v || !v.id) return null; const atual = veiculoPorId(v.id); return atual ? { id: atual.id, nome: atual.nome } : v; }
+  catch (e) { return null; }
+}
+function isChefeNotas(nome) { const u = carregarUsuarios().find(x => x.nome.toLowerCase() === String(nome || '').toLowerCase()); return !!(u && u.chefeNotas); }
+
+function adicionarVeiculo(nomeDireto) {
+  if (!usuarioAtivoIsMestre()) { toast('🔒 Apenas mestres/ADM podem cadastrar veículos.', true); return null; }
+  const inp = document.getElementById(nomeDireto ? 'folha-novo-veiculo' : 'input-novo-veiculo');
+  const nome = String((inp && inp.value) || '').trim().replace(/\s+/g, ' ');
+  if (!nome) { toast('⚠️ Digite o nome do veículo (ex: Caminhão 03 — ABC-1234).', true); return null; }
+  const lista = carregarVeiculos();
+  if (lista.some(v => v.nome.toLowerCase() === nome.toLowerCase())) { toast('⚠️ Esse veículo já existe.', true); return null; }
+  const v = { id: 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nome };
+  lista.push(v);
+  lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true }));
+  salvarVeiculos(lista);
+  if (inp) inp.value = '';
+  renderVeiculos(); if (pagAtivaMain('erros')) renderErros();
+  toast(`🚚 ${nome} cadastrado`);
+  return v;
+}
+function removerVeiculo(id) {
+  if (!usuarioAtivoIsMestre()) { toast('🔒 Apenas mestres/ADM podem remover veículos.', true); return; }
+  const v = veiculoPorId(id); if (!v) return;
+  if (!confirm(`Remover o veículo "${v.nome}"?\n\nOs erros já registrados continuam mostrando o nome. Celulares ligados a ele param de receber alertas.`)) return;
+  salvarVeiculos(carregarVeiculos().filter(x => x.id !== id));
+  renderVeiculos(); if (pagAtivaMain('erros')) renderErros();
+}
+function pagAtivaMain(id) { return !!document.getElementById('pag-' + id)?.classList.contains('ativa'); }
+function renderVeiculos() {
+  const card = document.getElementById('config-veiculos-card');
+  if (card) card.style.display = usuarioAtivoIsMestre() ? 'block' : 'none';
+  const el = document.getElementById('lista-veiculos'); if (!el) return;
+  const lista = carregarVeiculos(), meu = veiculoDoAparelho();
+  el.innerHTML = lista.length ? lista.map(v => `<div class="usuario-item"><div><span>🚚 ${escMapa(v.nome)}</span>${meu && meu.id === v.id ? '<span class="tag-adm" style="background:#e8f5e9;color:#1a6b32">📱 este celular</span>' : ''}</div>
+      <div><button onclick="removerVeiculo('${v.id}')" style="background:#fde8e8;color:#c0392b;border:none;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer">✕</button></div></div>`).join('')
+    : '<p style="font-size:13px;color:var(--texto-suave);text-align:center;padding:8px">Nenhum veículo cadastrado ainda.</p>';
+}
+
+// Tipo de usuário "Chefe de notas"
+function alternarChefeNotas(nome) {
+  if (!usuarioAtivoIsMestre()) { toast('🔒 Apenas mestres/ADM podem mudar isso.', true); return; }
+  if (isMestre(nome)) { toast('Mestres e ADM não precisam ser chefe de notas.'); return; }
+  const lista = carregarUsuarios();
+  const u = lista.find(x => x.nome === nome); if (!u) return;
+  const virar = !u.chefeNotas;
+  if (!confirm(virar ? `Marcar "${nome}" como 🚚 Chefe de notas?\n\nNo celular de cada chefe, um mestre/ADM usa "🚚 Definir veículo" para ligar o celular ao caminhão dele. Os alertas de erro chegam só no celular do veículo do erro.`
+                     : `Tirar "${nome}" de Chefe de notas?`)) return;
+  if (virar) u.chefeNotas = true; else delete u.chefeNotas;
+  salvarUsuarios(lista);
+  if (virar && confirm(`Deixar "${nome}" vendo SÓ a aba ⚠️ Erros?\n\n(Dá para mudar depois em 👁️ Acessos.)`)) {
+    const p = carregarPermissoes();
+    const ver = {}, editar = {};
+    ABAS_PERMISSAO.forEach(a => { ver[a.id] = a.id === 'erros'; if (a.editavel) editar[a.id] = a.id === 'erros'; });
+    p[nome.toLowerCase()] = { ver, editar };
+    salvarPermissoes(p);
+  }
+  renderConfig();
+  toast(virar ? `🚚 ${nome} agora é Chefe de notas` : `${nome} não é mais Chefe de notas`);
+}
+
+// "Definir veículo": liga ESTE celular a um veículo (só mestre/ADM)
+function abrirDefinirVeiculo(nome) {
+  if (!usuarioAtivoIsMestre()) { toast('🔒 Apenas mestres/ADM podem definir o veículo do celular.', true); return; }
+  const lista = carregarVeiculos(), meu = veiculoDoAparelho();
+  abrirFolhaMapa('🚚 Veículo deste celular', `
+    <p style="font-size:13px;color:var(--texto-suave);margin-bottom:10px;line-height:1.5">Faça isso <b>no celular do chefe de notas</b>. Este celular vai receber os alertas de erro <b>só do veículo escolhido</b>.
+      Depois, entre com o usuário <b>${escMapa(nome || 'do chefe')}</b> neste celular (Config → 🔓 Trocar usuário).</p>
+    <div style="font-size:13px;margin-bottom:10px">📱 Agora: <b>${meu ? escMapa(meu.nome) : 'nenhum veículo'}</b></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      ${lista.map(v => `<button onclick="definirVeiculoAparelho('${v.id}')" style="padding:13px;border-radius:10px;border:2px solid ${meu && meu.id === v.id ? '#2e7d32' : '#d0c9bb'};background:${meu && meu.id === v.id ? '#e8f5e9' : '#fff'};font-size:15px;font-weight:700;text-align:left;cursor:pointer">🚚 ${escMapa(v.nome)}${meu && meu.id === v.id ? ' ✅' : ''}</button>`).join('') || '<p style="font-size:13px;color:var(--texto-suave)">Nenhum veículo cadastrado — cadastre abaixo.</p>'}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="folha-novo-veiculo" placeholder="Novo veículo ex: Caminhão 03 — ABC-1234" style="flex:1;min-width:0;padding:10px 12px;border-radius:8px;border:1.5px solid #d0c9bb;font-size:14px" onkeydown="if(event.key==='Enter'){const v=adicionarVeiculo(true);if(v)abrirDefinirVeiculo(${JSON.stringify(nome || '').replace(/"/g, '&quot;')})}" />
+      <button onclick="const v=adicionarVeiculo(true);if(v)abrirDefinirVeiculo(${JSON.stringify(nome || '').replace(/"/g, '&quot;')})" style="background:var(--verde-escuro);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer">+ Add</button>
+    </div>
+    ${meu ? `<button onclick="definirVeiculoAparelho(null)" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #f5b7b1;background:#fde8e8;color:#c0392b;font-weight:700;cursor:pointer">🚫 Tirar o veículo deste celular</button>` : ''}`);
+}
+function definirVeiculoAparelho(id) {
+  if (!usuarioAtivoIsMestre()) { toast('🔒 Apenas mestres/ADM podem definir o veículo do celular.', true); return; }
+  if (!id) { localStorage.removeItem(CHAVE_VEICULO_APARELHO); toast('🚫 Este celular não recebe mais alertas de veículo.'); }
+  else {
+    const v = veiculoPorId(id); if (!v) return;
+    gravarLS(CHAVE_VEICULO_APARELHO, JSON.stringify({ id: v.id, nome: v.nome }));
+    semearErrosVistos(); // erros que já existiam não disparam alerta
+    toast(`🚚 Este celular agora recebe os alertas do ${v.nome}`);
+    pedirPermissaoNotificacao(true);
+  }
+  document.getElementById('mapa-folha')?.remove();
+  if (window.registrarAparelho) window.registrarAparelho(true);
+  renderConfig(); if (pagAtivaMain('erros')) renderErros();
+}
+
+// ----- Alertas -----
+const CHAVE_ERROS_VISTOS = 'estoque_erros_vistos';
+const chaveVistoErro = e => String(e.id) + '|' + (e.veiculo || '');
+function carregarErrosVistos() { try { return JSON.parse(localStorage.getItem(CHAVE_ERROS_VISTOS) || 'null'); } catch (e) { return null; } }
+function salvarErrosVistos(v) {
+  const existentes = new Set(carregarErros().map(chaveVistoErro));
+  const limpo = {}; Object.entries(v || {}).forEach(([k, t]) => { if (existentes.has(k)) limpo[k] = t; });
+  gravarLS(CHAVE_ERROS_VISTOS, JSON.stringify(limpo));
+}
+function semearErrosVistos() { const v = {}; carregarErros().forEach(e => { v[chaveVistoErro(e)] = 1; }); salvarErrosVistos(v); }
+function marcarErroVisto(e) { const v = carregarErrosVistos() || {}; v[chaveVistoErro(e)] = Date.now(); salvarErrosVistos(v); }
+function verificarAlertasErros() {
+  const meu = veiculoDoAparelho(); if (!meu) return;
+  const vistos = carregarErrosVistos();
+  if (!vistos) { semearErrosVistos(); return; }
+  const novos = carregarErros().filter(e => e.veiculo === meu.id && e.status === 'pendente' && !vistos[chaveVistoErro(e)]);
+  if (!novos.length) return;
+  novos.forEach(e => { vistos[chaveVistoErro(e)] = Date.now(); });
+  salvarErrosVistos(vistos);
+  alertarErros(novos, meu);
+}
+window.verificarAlertasErros = verificarAlertasErros;
+function pedirPermissaoNotificacao(silencioso) {
+  if (!('Notification' in window)) { if (!silencioso) toast('⚠️ Este navegador não permite notificações.', true); return; }
+  if (Notification.permission === 'granted') { if (!silencioso) toast('🔔 Notificações já estão ligadas.'); return; }
+  if (Notification.permission === 'denied') { toast('🔕 Notificações bloqueadas neste celular — libere nas configurações do navegador/app (Notificações → Permitir).', true); return; }
+  try { Promise.resolve(Notification.requestPermission()).then(r => { toast(r === 'granted' ? '🔔 Notificações ligadas!' : '🔕 Notificações não foram permitidas.', r !== 'granted'); if (pagAtivaMain('erros')) renderErros(); }); } catch (e) {}
+}
+let _ctxSom = null;
+function tocarAlerta() {
+  try {
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    _ctxSom = _ctxSom || new C();
+    if (_ctxSom.state === 'suspended') _ctxSom.resume();
+    [0, 0.35, 0.7].forEach((t, i) => {
+      const o = _ctxSom.createOscillator(), g = _ctxSom.createGain();
+      o.type = 'square'; o.frequency.value = i === 2 ? 1046 : 880;
+      g.gain.setValueAtTime(0.0001, _ctxSom.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.25, _ctxSom.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, _ctxSom.currentTime + t + 0.28);
+      o.connect(g); g.connect(_ctxSom.destination); o.start(_ctxSom.currentTime + t); o.stop(_ctxSom.currentTime + t + 0.3);
+    });
+  } catch (e) {}
+}
+document.addEventListener('pointerdown', () => { try { if (_ctxSom && _ctxSom.state === 'suspended') _ctxSom.resume(); } catch (e) {} }, { passive: true });
+async function notificarSistema(titulo, corpo, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return false;
+  const op = { body: corpo, tag, renotify: true, requireInteraction: true, vibrate: [400, 150, 400, 150, 800], icon: 'icon-192.png', badge: 'icon-192.png', data: { aba: 'erros' } };
+  let reg = null;
+  try { if (navigator.serviceWorker && /^https?:$/.test(location.protocol)) reg = await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(() => r(null), 3000))]); } catch (e) {}
+  try { if (reg && reg.showNotification) { await reg.showNotification(titulo, op); return true; } } catch (e) { registrarErro('notificação', e); }
+  try { new Notification(titulo, op); return true; } // computador (no celular só funciona pelo service worker)
+  catch (e) { registrarErro('notificação', e); return false; }
+}
+function alertarErros(novos, meu) {
+  tocarAlerta();
+  try { navigator.vibrate && navigator.vibrate([400, 150, 400, 150, 800]); } catch (e) {}
+  novos.forEach(e => notificarSistema(`🚨 Erro de carga — ${meu.nome}`, `📦 Carga ${e.numero}: ${String(e.descricao || '').slice(0, 140)}`, 'erro-' + e.id));
+  if (document.visibilityState !== 'visible') { window._tituloOriginal = window._tituloOriginal || document.title; document.title = `🚨 (${novos.length}) Erro de carga`; }
+  document.getElementById('alerta-erro')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'alerta-erro';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML = `<div style="background:#fff;border-radius:16px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4)">
+    <div style="background:#c0392b;color:#fff;padding:14px 16px;font-size:18px;font-weight:800">🚨 ${novos.length > 1 ? novos.length + ' erros novos' : 'Erro novo'} — ${escMapa(meu.nome)}</div>
+    <div style="padding:12px 16px;max-height:50vh;overflow:auto;color:#1a1a1a">
+      ${novos.map(e => `<div style="padding:8px 0;border-bottom:1px solid #eee"><div style="font-weight:800">📦 Carga ${escMapa(e.numero)}</div><div style="font-size:14px;margin-top:3px">${escMapa(e.descricao)}</div><div style="font-size:11px;color:#777;margin-top:3px">${e.responsavel ? '👤 ' + escMapa(e.responsavel) + ' · ' : ''}🕐 ${escMapa(e.criadoEm || e.data || '')}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;padding:12px 16px">
+      <button onclick="document.getElementById('alerta-erro').remove()" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #d0c9bb;background:#fff;font-weight:700;font-size:14px;cursor:pointer">OK</button>
+      <button onclick="document.getElementById('alerta-erro').remove();irPara('erros')" style="flex:2;padding:12px;border-radius:10px;border:none;background:#c0392b;color:#fff;font-weight:800;font-size:14px;cursor:pointer">⚠️ Ver na aba Erros</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && window._tituloOriginal) { document.title = window._tituloOriginal; window._tituloOriginal = null; } });
+// clique na notificação (vem do service worker) → abre a aba Erros
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.abrir) { try { irPara(ev.data.abrir); } catch (e) {} } });
 
 // ===================== CONFIGURAÇÕES / USUÁRIOS =====================
 const CHAVE_USUARIOS = 'estoque_usuarios_v1';
@@ -6610,7 +6839,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('mapa-viewport')?.classList.contains('tela-cheia') && !document.getElementById('mapa-folha')) alternarTelaCheiaMapa();
 });
 
-const VERSAO_APP = '2026.11.06k';
+const VERSAO_APP = '2026.11.08a';
 // ----- Aviso de versão nova (aba aberta há muito tempo no PC continuaria com a versão antiga) -----
 let _ultimaChecagemVersao = 0;
 async function checarNovaVersao() {
@@ -7637,9 +7866,12 @@ function renderConfig() {
           <div>
             <span>${seloUsuario(u.nome)} ${u.nome}</span>
             ${isMestreFixo(u.nome) ? '<span class="tag-adm fixo">Mestre</span>' : (isAdm(u.nome) ? '<span class="tag-adm">ADM</span>' : '')}
+            ${u.chefeNotas ? '<span class="tag-adm" style="background:#fff3e0;color:#b35c00">🚚 Chefe de notas</span>' : ''}
             <span style="font-size:11px;color:${temSenha(u.nome)?'#1a6b32':'#c0392b'};margin-left:8px">${temSenha(u.nome)?'🔐':'⚠️ sem senha'}</span>
           </div>
-          <div style="display:flex;gap:6px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            ${ehMestre && u.chefeNotas ? `<button onclick="abrirDefinirVeiculo('${u.nome}')" style="background:#ffe0b2;color:#8a4b00;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer">🚚 ${veiculoDoAparelho() ? 'Este celular: ' + escMapa(veiculoDoAparelho().nome) : 'Definir veículo'}</button>` : ''}
+            ${ehMestre && !isMestre(u.nome) ? `<button onclick="alternarChefeNotas('${u.nome}')" style="background:#fff8ee;color:#b35c00;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">${u.chefeNotas ? '🚚 Tirar chefe' : '🚚 Chefe de notas'}</button>` : ''}
             ${ehMestre && !isMestre(u.nome)?`<button onclick="abrirPermissoesUsuario('${u.nome}')" style="background:${usuarioTemRestricao(u.nome)?'#fff3e0':'#eef3fb'};color:${usuarioTemRestricao(u.nome)?'#b35c00':'#1a4f8b'};border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">${usuarioTemRestricao(u.nome)?'🔒':'👁️'} Acessos</button>`:''}
             ${ehMestre && !isMestreFixo(u.nome)?`<button onclick="alternarAdm('${u.nome}')" style="background:${isAdm(u.nome)?'#f3eefc':'#f6f1ff'};color:#5b2a9a;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">${isAdm(u.nome)?'⬇️ Tirar ADM':'🛡️ Tornar ADM'}</button>`:''}
             ${ehMestre?`<button onclick="definirSenhaUsuario('${u.nome}')" style="background:#e8f5e9;color:#1a5e20;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">${temSenha(u.nome)?'🔑 Alterar':'🔑 Definir'}</button>`:''}
@@ -7650,6 +7882,7 @@ function renderConfig() {
 
   const addWrap = document.getElementById('config-add-usuario-wrap');
   if (addWrap) addWrap.style.display = ehMestre ? 'flex' : 'none';
+  renderVeiculos();
 
   const acessoCard = document.getElementById('config-acesso-card');
   if (acessoCard) acessoCard.style.display = ehMestre ? 'block' : 'none';
@@ -8171,7 +8404,7 @@ window.diagnosticoSync = async function() {
   try {
     const sa = await comTempoLimite(getDoc(refAparelhos(uid)), 15000);
     const meu = idAparelho();
-    r.aparelhos = Object.entries(sa.exists() ? sa.data() : {}).map(([id, a]) => ({ eu: id === meu, nome: a.nome, versao: a.versao, usuario: a.usuario,
+    r.aparelhos = Object.entries(sa.exists() ? sa.data() : {}).map(([id, a]) => ({ eu: id === meu, nome: a.nome, versao: a.versao, usuario: a.usuario, veiculo: a.veiculo || '', alertas: a.alertas,
       visto: a.visto?.toMillis ? a.visto.toMillis() : a.local, pisos: a.pisos, pendentes: a.pendentes, tempoReal: a.tempoReal }))
       .sort((a, b) => (b.visto || 0) - (a.visto || 0)).slice(0, 8);
   } catch (e) { r.aparelhosErro = e?.code || e?.message; }
@@ -8462,7 +8695,7 @@ const TR = {
   quebras:       { chave: CHAVE_QUEBRAS, n: 8,  antigoRef: uid => refQuebras(uid),       antigoCampo: 'lista',         ordenar: ordemIdDesc,
                    aoMudar: () => { if (pagAtiva('quebras')) renderQuebras(); if (pagAtiva('conferencia')) renderConferencia(); }, msg: '🔄 Quebras atualizadas' },
   erros:         { chave: CHAVE_ERROS,   n: 4,  antigoRef: uid => refErros(uid),         antigoCampo: 'lista',         ordenar: ordemIdDesc,
-                   aoMudar: () => { if (pagAtiva('erros')) renderErros(); }, msg: '🔄 Erros atualizados' },
+                   aoMudar: () => { if (pagAtiva('erros')) renderErros(); if (window.verificarAlertasErros) verificarAlertasErros(); }, msg: '🔄 Erros atualizados' },
   movimentacoes: { chave: CHAVE_MOV,     n: 16, antigoRef: uid => refMovimentacoes(uid), antigoCampo: 'movimentacoes', ordenar: (a, b) => tsMov(b) - tsMov(a),
                    aoMudar: () => { if (pagAtiva('movimentacoes')) renderMovimentacoes(); if (pagAtiva('mapa') && !(window.mapaEd && mapaEd.ativo)) renderMapa(); }, msg: '🔄 Movimentações atualizadas' }
 };
@@ -8778,6 +9011,7 @@ function terminarImportacao(nome, st) {
   st.importado = true;
   try { localStorage.setItem(flag, '1'); } catch (e) {}
   try { espelhar(nome); } catch (e) { registrarErro('espelhar ' + nome, e); }
+  if (nome === 'erros' && window.verificarAlertasErros) { try { verificarAlertasErros(); } catch (e) { registrarErro('alerta de erro', e); } }
   st.avisar = true;
   atualizarEstadoTR(nome);
 }
@@ -9076,6 +9310,8 @@ function registrarAparelho(forcar) {
   const st = trEstado.conferencia;
   gravarNuvem(refAparelhos(uid), { [idAparelho()]: {
     versao: VERSAO_APP, visto: serverTimestamp(), local: Date.now(), nome: descreverAparelho(), usuario: window._usuarioAtivo || '',
+    veiculo: (typeof veiculoDoAparelho === 'function' && veiculoDoAparelho()) ? veiculoDoAparelho().nome : '',
+    alertas: ('Notification' in window) ? Notification.permission : 'sem suporte',
     pisos: carregarConferencia().length, pendentes: LISTAS_TR.reduce((t, n) => t + Object.keys(carregarPend(TR[n].chave)).length, 0),
     tempoReal: st ? (st.morto ? 'caído' : st.importado ? 'ligado' : st.pronto ? 'importando' : 'conectando') : 'não iniciado'
   } }, { merge: true }).catch(e => registrarErro('registrar aparelho', e));
@@ -9111,6 +9347,7 @@ onAuthStateChanged(auth, async user => {
   if (user) {
     window._usuarioUid = user.uid;
     window._usuarioEmail = user.email;
+    try { const abaUrl = new URLSearchParams(location.search).get('aba'); if (abaUrl) setTimeout(() => { try { irPara(abaUrl); } catch (e) {} }, 300); } catch (e) {}
 
     document.getElementById('tela-login').style.display = 'none';
     document.getElementById('app-root').style.display = 'flex';
