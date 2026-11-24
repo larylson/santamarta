@@ -1646,13 +1646,41 @@ PASSOS PARA RODAR NO GITHUB PAGES:
     #leitor-etiqueta.congelado #leitor-quadro { display:block; }
     #leitor-etiqueta.congelado #leitor-video { visibility:hidden; }
     #leitor-guia { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:88%; width:min(88cqw, calc(80cqh * 4 / 3)); aspect-ratio:4/3; border:3px solid rgba(255,255,255,.9); border-radius:16px; box-shadow:0 0 0 100vmax rgba(0,0,0,.32); pointer-events:none; transition:border-color .2s; }
+    #leitor-guia.longe { border-color:#f9a825; }
+    #leitor-guia.segurando { border-color:#4caf50; }
     #leitor-etiqueta.congelado #leitor-guia { border-color:#4caf50; box-shadow:none; }
+    #leitor-etiqueta.revisando #leitor-guia, #leitor-etiqueta.revisando #leitor-dica { display:none; }
+    #leitor-revisao { display:none; background:#151515; padding:12px 14px 4px; max-height:62vh; max-height:62dvh; overflow-y:auto; border-top:1px solid #2a2a2a; }
+    #leitor-etiqueta.revisando #leitor-revisao { display:block; }
+    #leitor-etiqueta.revisando #leitor-status, #leitor-etiqueta.revisando .leitor-botoes { display:none; }
+    #leitor-revisao .rev-titulo { font-size:16px; font-weight:800; margin-bottom:8px; }
+    #leitor-revisao .rev-campo { display:block; margin-bottom:8px; }
+    #leitor-revisao .rev-campo > span, #leitor-revisao .rev-info > span { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#a9b3a6; margin-bottom:3px; }
+    #leitor-revisao .rev-campo em { font-style:normal; text-transform:none; letter-spacing:0; font-weight:700; margin-left:4px; }
+    #leitor-revisao em.ok { color:#81c784; }
+    #leitor-revisao em.atencao { color:#ffd54f; }
+    #leitor-revisao input { width:100%; box-sizing:border-box; padding:10px 12px; font-size:16px; font-weight:700; border-radius:8px; border:1.5px solid #3d4a3d; background:#0d0d0d; color:#fff; }
+    #leitor-revisao input:focus { outline:none; border-color:#66bb6a; }
+    #leitor-revisao .rev-grade { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-bottom:8px; align-items:end; }
+    #leitor-revisao .rev-grade .rev-campo { margin-bottom:0; }
+    #leitor-revisao .rev-info { background:#1f1f1f; border-radius:8px; padding:7px 9px; min-height:44px; box-sizing:border-box; }
+    #leitor-revisao .rev-info b { font-size:15px; }
+    #leitor-revisao .rev-grade input { padding:8px 9px; font-size:15px; }
+    #leitor-revisao .rev-campo.do-texto input { border-color:#c79100; color:#ffe08a; }
+    #leitor-revisao .rev-campo.do-texto > span { color:#ffd54f; }
+    #leitor-revisao .rev-campo.duvida input { border-color:#e53935; color:#ffb4a9; }
+    #leitor-revisao .rev-campo.duvida > span { color:#ff8a80; }
+    #leitor-revisao .rev-sub { font-size:13px; color:#cfd8cc; margin-bottom:8px; }
+    #leitor-revisao .rev-aviso { background:#3a2e0b; color:#ffe08a; border-radius:8px; padding:7px 9px; font-size:13px; line-height:1.4; margin-bottom:8px; }
+    #leitor-revisao .rev-botoes { display:flex; gap:8px; position:sticky; bottom:0; background:#151515; padding:6px 0 calc(10px + env(safe-area-inset-bottom)); }
+    #leitor-revisao .rev-botoes button { flex:1; padding:14px 6px; border:none; border-radius:10px; font-size:15px; font-weight:800; cursor:pointer; background:#2b2b2b; color:#fff; }
+    #leitor-revisao .rev-botoes button.rev-usar { background:#2e7d32; flex:1.4; }
     #leitor-dica { position:absolute; left:0; right:0; top:14px; z-index:1; text-align:center; font-size:14px; font-weight:700; text-shadow:0 1px 4px #000; pointer-events:none; }
     #leitor-status { padding:12px 16px; text-align:center; font-size:15px; line-height:1.4; background:#111; min-height:44px; }
     #leitor-status .leitor-barra { height:6px; border-radius:3px; background:#333; margin:8px auto 0; max-width:280px; overflow:hidden; }
     #leitor-status .leitor-barra > div { height:100%; background:#4caf50; width:0; transition:width .2s; }
     .leitor-botoes { display:flex; gap:8px; padding:10px 12px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); background:#111; }
-    .leitor-botoes button { flex:1; padding:13px 6px; border:none; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:#2b2b2b; color:#fff; }
+    .leitor-botoes button { flex:1; padding:13px 4px; border:none; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:#2b2b2b; color:#fff; }
     .leitor-botoes button.luz-ligada { background:#f9a825; color:#000; }
     #leitor-btn-pular { display:none; background:#1f4e79; }
     .campo-lido { background:#e8f5e9 !important; border-color:#43a047 !important; }
@@ -2365,8 +2393,10 @@ PASSOS PARA RODAR NO GITHUB PAGES:
     <div id="leitor-guia"></div>
   </div>
   <div id="leitor-status">Abrindo a câmera…</div>
+  <div id="leitor-revisao"></div>
   <div class="leitor-botoes">
     <button id="leitor-btn-luz" style="display:none" onclick="alternarLanternaLeitor()">🔦 Luz</button>
+    <button id="leitor-btn-texto" style="display:none" onclick="iniciarLeituraTexto(false)">📸 Ler texto</button>
     <button id="leitor-btn-foto" onclick="escolherFotoLeitor()">🖼️ Usar foto</button>
     <button id="leitor-btn-pular" onclick="pularLeituraNome()">⏭️ Sem o nome</button>
     <button id="leitor-btn-fechar" onclick="fecharLeitorEtiqueta()">✕ Fechar</button>
@@ -4749,6 +4779,7 @@ function montarItemConfDoForm() {
   if (confEtiquetaAtual && confTipoAtual === 'piso') {
     if (confEtiquetaAtual.gtin) item.gtin = confEtiquetaAtual.gtin;
     if (confEtiquetaAtual.sscc) item.sscc = confEtiquetaAtual.sscc;
+    if (confEtiquetaAtual.codigos) item.codEtiqueta = confEtiquetaAtual.codigos;
   }
 
   item.criadoEm = new Date().toLocaleString('pt-BR');
@@ -4867,14 +4898,53 @@ function obterMotorLeitor() {
   }
   return _leitor.motor;
 }
+// Posição de cada código: centro (cx, cy) e tamanho (tam), em fração do lado menor da imagem
+function geometriaCodigo(pontos, w, h) {
+  const s = Math.min(w, h);
+  if (!pontos || pontos.length < 4 || pontos.some(p => !p)) return { cx: w / 2 / s, cy: h / 2 / s, tam: 0 };
+  const cx = pontos.reduce((a, p) => a + p.x, 0) / pontos.length, cy = pontos.reduce((a, p) => a + p.y, 0) / pontos.length;
+  const d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const lado = Math.max(d(pontos[0], pontos[1]), d(pontos[1], pontos[2]), d(pontos[2], pontos[3]), d(pontos[3], pontos[0]));
+  return { cx: cx / s, cy: cy / s, tam: lado / s };
+}
 async function detectarCodigos(motor, canvas) {
+  const w = canvas.width, h = canvas.height;
   if (motor.tipo === 'zxing') {
-    const img = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height);
-    const r = await motor.Z.readBarcodes(img, { formats: LEITOR_FORMATOS, tryHarder: true, maxNumberOfSymbols: 6 });
-    return r.filter(x => x.isValid && x.text).map(x => x.text);
+    const img = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h);
+    const r = await motor.Z.readBarcodes(img, { formats: LEITOR_FORMATOS, tryHarder: true, maxNumberOfSymbols: 8 });
+    return r.filter(x => x.isValid && x.text).map(x => {
+      const p = x.position;
+      return { texto: x.text, formato: x.format, ...geometriaCodigo(p ? [p.topLeft, p.topRight, p.bottomRight, p.bottomLeft] : null, w, h) };
+    });
   }
   const r = await motor.det.detect(canvas);
-  return r.map(x => x.rawValue).filter(Boolean);
+  return r.filter(x => x.rawValue).map(x => ({ texto: x.rawValue, formato: x.format, ...geometriaCodigo(x.cornerPoints, w, h) }));
+}
+// Várias etiquetas na imagem (pallets lado a lado): fica com a do MEIO e junta só os códigos dessa etiqueta
+function escolherEtiqueta(codigos, w, h) {
+  const s = Math.min(w, h), mx = w / 2 / s, my = h / 2 / s;
+  const todos = (codigos || []).map(c => ({ ...c, d: interpretarCodigos([c.texto]) }));
+  const lidos = todos.filter(c => Object.keys(c.d).length);
+  // códigos sem dados do produto (ex.: "10107050"): servem para o app reconhecer o piso da próxima vez
+  const outros = [...new Set(todos.filter(c => !Object.keys(c.d).length && /^[A-Za-z0-9.\-]{4,30}$/.test(c.texto)).map(c => c.texto))];
+  const comGtin = lidos.filter(c => c.d.gtin);
+  if (!comGtin.length) {
+    if (!todos.length) return null;
+    const so = lidos.find(c => c.d.sscc);
+    const d = so ? { sscc: so.d.sscc } : {};
+    if (outros.length) d.codigosEtiqueta = outros;
+    return { dados: d, cx: so ? so.cx : 0, cy: so ? so.cy : 0, tam: 0, chave: '' };
+  }
+  const nota = c => (/matrix/i.test(c.formato || '') ? 0.3 : 0) + Object.keys(c.d).length * 0.02 + c.tam - Math.hypot(c.cx - mx, c.cy - my);
+  comGtin.sort((a, b) => nota(b) - nota(a));
+  const p = comGtin[0], dados = { ...p.d }, perto = 4 * p.tam + 0.08;
+  lidos.forEach(c => {
+    if (c === p || Math.hypot(c.cx - p.cx, c.cy - p.cy) > perto) return; // longe = outra etiqueta
+    if (c.d.gtin && c.d.gtin !== dados.gtin) return;                      // outro produto
+    Object.keys(c.d).forEach(k => { if (!dados[k]) dados[k] = c.d[k]; });
+  });
+  if (outros.length) dados.codigosEtiqueta = outros;
+  return { dados, cx: p.cx, cy: p.cy, tam: p.tam, chave: [dados.gtin, dados.sscc || '', dados.lote || ''].join('|') };
 }
 function canvasReduzido(fonte, max, reaproveitar) {
   const w0 = fonte.videoWidth || fonte.naturalWidth || fonte.width, h0 = fonte.videoHeight || fonte.naturalHeight || fonte.height;
@@ -4965,9 +5035,11 @@ function normTamanho(s) { const m = String(s || '').replace(/,/g, '.').match(/(\
 function carregarCatalogoGtin() { try { return JSON.parse(localStorage.getItem(CHAVE_CATALOGO_GTIN)) || {}; } catch (e) { return {}; } }
 function lembrarProdutoGtin(item) {
   try {
-    if (!item || !item.gtin || !String(item.nome || '').trim()) return;
+    if (!item || !String(item.nome || '').trim()) return;
+    const chaves = [item.gtin, ...String(item.codEtiqueta || '').split(',').filter(Boolean).map(c => 'c:' + c)].filter(Boolean);
+    if (!chaves.length) return;
     const cat = carregarCatalogoGtin();
-    cat[item.gtin] = { nome: item.nome, marca: item.marca || '', codigo: item.codigo || '', tamanho: item.tamanho || '', em: agoraSync() };
+    chaves.forEach(k => { cat[k] = { nome: item.nome, marca: item.marca || '', codigo: item.codigo || '', tamanho: item.tamanho || '', em: agoraSync() }; });
     const ks = Object.keys(cat);
     if (ks.length > 800) ks.sort((a, b) => (cat[a].em || 0) - (cat[b].em || 0)).slice(0, ks.length - 800).forEach(k => delete cat[k]);
     gravarLS(CHAVE_CATALOGO_GTIN, JSON.stringify(cat));
@@ -4988,35 +5060,80 @@ function produtoPorGtin(gtin) {
   ['nome', 'marca', 'codigo', 'tamanho'].forEach(k => { const f = fontes.find(x => String(x[k] || '').trim()); r[k] = f ? String(f[k]).trim() : ''; });
   return r;
 }
+// Etiqueta sem GTIN: reconhece o piso pelos outros códigos de barras dela (aprendidos em leituras anteriores)
+function produtoPorCodigos(codigos) {
+  const lista = (codigos || []).filter(Boolean);
+  if (!lista.length) return null;
+  const fontes = [];
+  [...carregarConferencia(), ...carregarQuebras()].forEach(i => {
+    if (i && i.codEtiqueta && String(i.nome || '').trim() && String(i.codEtiqueta).split(',').some(c => lista.includes(c))) fontes.push({ ...i, _t: tsItem(i) });
+  });
+  const cat = carregarCatalogoGtin();
+  lista.forEach(c => { const x = cat['c:' + c]; if (x && x.nome) fontes.push({ ...x, _t: x.em || 0 }); });
+  if (!fontes.length) return null;
+  fontes.sort((a, b) => b._t - a._t);
+  const r = {};
+  ['nome', 'marca', 'codigo', 'tamanho'].forEach(k => { const f = fontes.find(x => String(x[k] || '').trim()); r[k] = f ? String(f[k]).trim() : ''; });
+  return r;
+}
 // Mesma fábrica = mesmo começo do GTIN → mesma marca
 function marcaPorPrefixo(gtin) {
   if (!gtin || gtin.length < 12) return '';
-  const p = gtin.slice(0, 8);
-  const daLista = [...carregarConferencia(), ...carregarQuebras()].find(i => i && i.gtin && i.gtin !== gtin && i.gtin.slice(0, 8) === p && i.marca);
+  const p = gtin.slice(0, 9); // prefixo da empresa no Brasil: 789 + até 6 dígitos
+  const daLista = [...carregarConferencia(), ...carregarQuebras()].find(i => i && i.gtin && i.gtin !== gtin && i.gtin.slice(0, 9) === p && i.marca);
   if (daLista) return daLista.marca;
   const cat = carregarCatalogoGtin();
-  const k = Object.keys(cat).find(g => g !== gtin && g.slice(0, 8) === p && cat[g].marca);
+  const k = Object.keys(cat).find(g => g !== gtin && !g.startsWith('c:') && g.slice(0, 9) === p && cat[g].marca);
   return k ? cat[k].marca : '';
 }
-// Piso lido pela foto: procura um lançamento antigo com o mesmo nome (usa o nome, a marca e o código de lá)
+function distanciaEdicao(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length;
+  if (!m) return n; if (!n) return m;
+  let ant = Array.from({ length: n + 1 }, (_, j) => j), cur = new Array(n + 1);
+  for (let i = 1; i <= m; i++) {
+    cur[0] = i;
+    for (let j = 1; j <= n; j++) cur[j] = Math.min(ant[j] + 1, cur[j - 1] + 1, ant[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    [ant, cur] = [cur, ant];
+  }
+  return ant[n];
+}
+function semelhanca(a, b) { const m = Math.max(a.length, b.length); return m ? 1 - distanciaEdicao(a, b) / m : 0; }
+// Nome lido pela foto → procura o piso mais PARECIDO já lançado (corrige erros de leitura: "AREZZ0 BEIGE SATlN" → "Arezzo Beige Satin Ac")
 function produtoPorNome(nome, tamanho) {
   const n = normTexto(nome);
   if (n.length < 5) return null;
+  const qtdPalavras = n.split(' ').length;
   const tam = normTamanho(tamanho);
+  const candidatos = [...carregarConferencia(), ...carregarQuebras(), ...carregar()]
+    .filter(i => i && (!i.tipo || i.tipo === 'piso')).map(i => ({ ...i, _t: tsItem(i) }));
+  Object.values(carregarCatalogoGtin()).forEach(c => candidatos.push({ ...c, _t: c.em || 0 }));
   let melhor = null;
-  [...carregarConferencia(), ...carregarQuebras(), ...carregar()].forEach(i => {
-    if (!i || (i.tipo && i.tipo !== 'piso')) return;
+  candidatos.forEach(i => {
     const nn = normTexto(i.nome);
     if (!nn) return;
-    let nota = nn === n ? 3 : nn.startsWith(n + ' ') ? 2 : n.startsWith(nn + ' ') ? 1 : 0;
-    if (!nota) return;
     const ti = normTamanho(i.tamanho);
     if (tam && ti && ti !== tam) return; // tamanho diferente = outro produto
-    if (tam && ti === tam) nota += 3;
-    const t = tsItem(i);
-    if (!melhor || nota > melhor.nota || (nota === melhor.nota && t > melhor.t)) melhor = { nota, t, nome: i.nome, marca: i.marca || '', codigo: i.codigo || '', tamanho: i.tamanho || '' };
+    const comeco = nn.split(' ').slice(0, qtdPalavras).join(' '); // "arezzo beige satin ac" → "arezzo beige satin"
+    let sim = Math.max(semelhanca(n, nn), semelhanca(n, comeco) - 0.02);
+    if (sim < 0.86) return;
+    if (tam && ti === tam) sim += 0.05;
+    if (!melhor || sim > melhor.sim + 1e-9 || (Math.abs(sim - melhor.sim) <= 1e-9 && i._t > melhor.t)) {
+      melhor = { sim, t: i._t, nome: i.nome, marca: i.marca || '', codigo: i.codigo || '', tamanho: i.tamanho || '' };
+    }
   });
   return melhor;
+}
+// O formato confere com o m² da caixa? (m² ÷ área da peça tem que dar um número inteiro de peças)
+function tamanhoConfereComM2(tamanho, m2) {
+  const t = normTamanho(tamanho), m = parseFloat(String(m2 || '').replace(',', '.'));
+  if (!t || !m) return null;
+  let [a, b] = t.split('x').map(Number);
+  if (a > 10) a /= 100; if (b > 10) b /= 100;
+  const area = a * b;
+  if (!area) return null;
+  const pecas = m / area, r = Math.round(pecas);
+  return r >= 1 && Math.abs(pecas - r) <= Math.max(0.12, r * 0.06);
 }
 
 // ---------- Leitura do nome pela foto (OCR) ----------
@@ -5030,50 +5147,230 @@ function prepararOCR() {
   }
   return _ocrPronto;
 }
-const ROTULOS_ETIQUETA = /\b(PEI|LOCAL|USO|FORMATO|EMPILH\w*|AREA|CAIXAS?|PESO|FORNO|TURMA|BITOLA|TON|TONALIDADE|LIBERADO|SSCC|GTIN|EAN|QUALIDADE|LOTE|MAX|KG|TOTAL|DATA|VALIDADE|FABRICA\w*|REF|COD|CODIGO)\b/;
+const ROTULOS_ETIQUETA = /\b(END|APROVADO|REPROVADO|INSPETOR|ENDERECO|PEI|LOCAL|USO|FORMATO|EMPILH\w*|AREA|CAIXAS?|PESO|FORNO|TURMA|BITOLA|TON|TONALIDADE|LIBERADO|SSCC|GTIN|EAN|QUALIDADE|LOTE|MAX|KG|TOTAL|DATA|VALIDADE|FABRICA\w*|REF|COD|CODIGO)\b/;
 function capitalizarNome(s) { return String(s).toLowerCase().replace(/(^|[\s\-\/])([a-zà-ÿ])/g, (m, a, b) => a + b.toUpperCase()); }
+// Erros típicos da leitura de letras: "AREZZ0" → "AREZZO", "SATlN" → "SATIN"
+function corrigirPalavraOCR(t) {
+  const letras = (t.match(/[A-Za-zÀ-ÿ]/g) || []).length, digitos = (t.match(/\d/g) || []).length;
+  if (letras >= 3 && digitos && digitos <= letras / 3) t = t.replace(/0/g, 'O').replace(/1/g, 'I').replace(/5/g, 'S').replace(/8/g, 'B');
+  const maiusculas = (t.match(/[A-ZÀ-Ý]/g) || []).length;
+  if (maiusculas >= 3 && maiusculas >= letras * 0.6) t = t.replace(/[l|]/g, 'I');
+  return t;
+}
+// Valor depois de um rótulo ("LOTE: 10830130"), aceitando o rótulo lido torto ("rore:") e números com letras trocadas ("TOB30130")
+function numeroOCR(v) {
+  const d = (v.match(/\d/g) || []).length;
+  if (d >= Math.max(2, v.replace(/\s/g, '').length * 0.5)) v = v.replace(/\s+/g, '').replace(/[Oo]/g, '0').replace(/[Il|T]/g, '1').replace(/B/g, '8').replace(/S/g, '5').replace(/Z/g, '2');
+  return v.replace(/[^0-9A-Za-z\-\/]/g, '').toUpperCase();
+}
+function campoRotulado(linhas, rotulos, curtos, minDigitos) { const a = camposRotulados(linhas, rotulos, curtos, minDigitos); return a.length ? String(a[0]) : ''; }
+// Todas as ocorrências (a etiqueta costuma repetir lote e tonalidade em letra pequena: "L: 10830130", "T: 161")
+function camposRotulados(linhas, rotulos, curtos, minDigitos) {
+  const achados = [];
+  for (const l of linhas) {
+    const re = /(?:^|[^A-Za-zÀ-ÿ])([A-Za-zÀ-ÿ]{1,10})\s*[:.]+\s*([A-Za-z0-9|][A-Za-z0-9| ]{0,18})/g;
+    let m;
+    while ((m = re.exec(String(l.texto)))) {
+      const chave = normTexto(m[1]).toUpperCase();
+      const ok = rotulos.includes(chave) || curtos.includes(chave) || (chave.length >= 3 && rotulos.some(r => r.length >= 4 && semelhanca(chave, r) >= 0.5));
+      if (!ok) continue;
+      // valor = 1ª palavra (junta pedaços curtos: "1 0830130" → "10830130")
+      const partes = m[2].trim().split(/\s+/);
+      let bruto = partes.shift() || '';
+      while (partes.length && bruto.replace(/[^0-9A-Za-z]/g, '').length < 4 && /^[0-9OoIl|]+$/.test(partes[0])) bruto += partes.shift();
+      const v = numeroOCR(bruto);
+      const pal = (l.palavras || []).find(p => numeroOCR(String(p.t || '')).includes(v.slice(0, 3)));
+      const conf = pal && typeof pal.c === 'number' ? pal.c : (l.conf || 0);
+      if ((v.match(/\d/g) || []).length >= Math.min(minDigitos, 2) && v.length >= (curtos.includes(chave) ? 3 : 1) && v.length <= 16) achados.push(Object.assign(new String(v), { conf }));
+    }
+  }
+  achados.sort((a, b) => b.conf - a.conf);
+  return achados;
+}
 function interpretarTextoEtiqueta(linhas) {
   const r = {};
   const tudo = linhas.map(l => l.texto).join('\n');
-  const lf = linhas.find(l => /formato/i.test(l.texto) && /\d{2,3}\s*[xX×]\s*\d{2,3}/.test(l.texto));
-  const mt = (lf ? lf.texto : tudo).match(/(\d{2,3})\s*[xX×]\s*(\d{2,3})/);
-  if (mt) r.tamanho = `${+mt[1]}x${+mt[2]}`;
+  // Formato: "90X90", "60 x 120"… (letra O lida no lugar do zero: "9OX9O")
+  const numeros = s => s.replace(/(\d)[Oo]/g, '$10').replace(/[Oo](?=\d)/g, '0').replace(/(\d)[Oo]/g, '$10');
+  const reTam = /(\d{2,3})\s*[xX×]\s*(\d{2,3})/g;
+  const tamanhos = [];
+  const linhasF = linhas.filter(l => /formato/i.test(l.texto)).concat(linhas.filter(l => !/formato/i.test(l.texto)));
+  linhasF.forEach(l => {
+    let m; const s = numeros(l.texto); reTam.lastIndex = 0;
+    while ((m = reTam.exec(s))) {
+      const a = +m[1], b = +m[2], t = `${a}x${b}`;
+      if (a >= 10 && a <= 300 && b >= 10 && b <= 300 && !tamanhos.includes(t)) tamanhos.push(t);
+    }
+  });
+  if (tamanhos.length) { r.tamanho = tamanhos[0]; r.tamanhos = tamanhos; }
   const mg = tudo.match(/GTIN\D{0,4}(\d{13,14})/i);
   if (mg && digitoGS1Ok(mg[1])) r.gtin = mg[1].length === 14 && mg[1][0] === '0' ? mg[1].slice(1) : mg[1];
+  if (!r.gtin) { // EAN impresso solto, com espaços: "789 95109 4106 3"
+    const re = /(?:^|\D)(7[89]\d(?:\s?\d){10})(?!\d)/g; let m;
+    while ((m = re.exec(tudo))) { const g = m[1].replace(/\s/g, ''); if (digitoGS1Ok(g)) { r.gtin = g; break; } }
+  }
+  // Campos escritos na etiqueta (para etiquetas sem código 2D): "LOTE: 10830130", "TON.: 161", "BITOLA: 5"
+  const valorDe = re => { for (const l of linhas) { const m = String(l.texto).match(re); if (m) return m[1].toUpperCase(); } return ''; };
+  const lotes = camposRotulados(linhas, ['LOTE', 'LOT'], ['L'], 4), tons = camposRotulados(linhas, ['TON', 'TONALIDADE', 'TONAL'], ['T'], 1);
+  if (lotes.length) r.lote = String(lotes[0]);
+  if (tons.length) r.tonalidade = String(tons[0]);
+  Object.defineProperty(r, 'candidatos', { value: { lote: lotes, tonalidade: tons }, enumerable: false });
+  const bit = valorDe(/\bBITOLA\s*[:.\-]+\s*([A-Z0-9]{1,4})\b/i) || valorDe(/\bBITOLA\s+(\d{1,3}[A-Z]?)\b/i);
+  if (bit) r.bitola = bit;
+  // "24   67,2 m²" → 24 caixas no pallet, 67,2 m² → 2,8 m² por caixa
+  const mm = tudo.match(/(?:^|\s)(\d{1,3})\s+(\d{1,4}[,.]\d{1,3})\s*m(?:[²2*]|\b)/i);
+  if (mm) {
+    const cx = +mm[1], tot = parseFloat(mm[2].replace(',', '.'));
+    if (cx > 0 && tot > 0 && tot / cx > 0.3 && tot / cx < 6) { r.caixasPorPallet = String(cx); r.m2PorCaixa = String(+(tot / cx).toFixed(4)); }
+  }
   const ms = tudo.match(/SSCC\D{0,4}(\d{18})/i);
   if (ms && digitoGS1Ok(ms[1])) r.sscc = ms[1];
   // Nome: a linha de palavras com as letras MAIORES da etiqueta (que não seja um rótulo como "Formato", "Lote"…)
   let melhor = null;
-  // (avalia palavra por palavra: risco de caneta ou fita em cima da etiqueta não derruba a linha toda)
-  linhas.forEach(l => {
-    if (ROTULOS_ETIQUETA.test(normTexto(l.texto).toUpperCase())) return;
-    const base = l.palavras && l.palavras.length ? l.palavras : l.texto.split(/\s+/).map(t => ({ t, h: 0 }));
-    const pals = base
-      .map(p => ({ t: String(p.t || '').replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''), h: p.h || 0, c: typeof p.c === 'number' ? p.c : (l.conf || 0) }))
-      .filter(p => p.t.length >= 2 && /[A-Za-zÀ-ÿ]{2}/.test(p.t) && !/[^A-Za-zÀ-ÿ0-9\-.\/]/.test(p.t) && p.c >= 15);
-    if (pals.length < 2) return;
-    const conf = pals.reduce((soma, p) => soma + p.c, 0) / pals.length;
-    if (conf < 50) return;
-    const letras = pals.map(p => p.t).join('').replace(/[^A-Za-zÀ-ÿ]/g, '').length;
-    if (letras < 6) return;
-    const alturas = pals.map(p => p.h).filter(Boolean).sort((x, y) => x - y);
-    const h = alturas.length ? alturas[Math.floor(alturas.length / 2)] : 0;
-    const nota = h * 10 + letras + conf / 10;
-    if (!melhor || nota > melhor.nota) melhor = { nota, texto: pals.map(p => p.t).join(' ') };
-  });
-  if (melhor) r.nome = capitalizarNome(melhor.texto);
+  linhas.forEach(l => { const n = nomeDaLinha(l); if (n && (!melhor || n.nota > melhor.nota)) melhor = n; });
+  if (melhor) {
+    r.nome = capitalizarNome(melhor.texto);
+    Object.defineProperty(r, '_nome', { value: melhor, enumerable: false }); // detalhes para a 2ª leitura
+  }
   return r;
 }
-async function lerTextoEtiqueta(fonte) {
+// Avalia uma linha como NOME do piso, palavra por palavra (risco de caneta ou fita em cima da etiqueta não derruba a linha toda)
+function nomeDaLinha(l) {
+  if (!l || ROTULOS_ETIQUETA.test(normTexto(l.texto).toUpperCase())) return null;
+  const base = l.palavras && l.palavras.length ? l.palavras : String(l.texto || '').split(/\s+/).map(t => ({ t, h: 0 }));
+  const todas = base
+    .map(p => ({ ...p, t: corrigirPalavraOCR(String(p.t || '').replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, '')), h: p.h || 0, c: typeof p.c === 'number' ? p.c : (l.conf || 0) }))
+    .filter(p => p.t.length >= 2 && /[A-Za-zÀ-ÿ]{2}/.test(p.t) && !/[^A-Za-zÀ-ÿ0-9\-.\/]/.test(p.t));
+  let pals = todas.filter(p => p.c >= 15);
+  // nome em MAIÚSCULAS: pedacinhos em minúscula são sujeira (risco, fita, reflexo)
+  const maiusc = s => (s.match(/[A-ZÀ-Ý]/g) || []).length, minusc = s => (s.match(/[a-zß-ÿ]/g) || []).length;
+  const tMai = pals.reduce((s, p) => s + maiusc(p.t), 0), tMin = pals.reduce((s, p) => s + minusc(p.t), 0);
+  if (tMai >= 0.7 * (tMai + tMin)) pals = pals.filter(p => maiusc(p.t) >= minusc(p.t));
+  if (pals.length < 2) return null;
+  const conf = pals.reduce((soma, p) => soma + p.c, 0) / pals.length;
+  if (conf < 50) return null;
+  const letras = pals.map(p => p.t).join('').replace(/[^A-Za-zÀ-ÿ]/g, '').length;
+  if (letras < 6) return null;
+  const digitos = pals.map(p => p.t).join('').replace(/\D/g, '').length;
+  if (digitos > letras * 0.3) return null; // "LOTE 10830130" não é nome
+  const alturas = pals.map(p => p.h).filter(Boolean).sort((x, y) => x - y);
+  const h = alturas.length ? alturas[Math.floor(alturas.length / 2)] : 0;
+  const boas = pals.filter(p => p.c >= 60 && typeof p.y === 'number');
+  return {
+    pals: pals.map(p => ({ t: p.t, c: p.c })),
+    texto: pals.map(p => p.t).join(' '),
+    nota: h * 10 + letras + conf / 10,                                         // escolhe a linha (letras grandes)
+    qualidade: pals.reduce((s, p) => s + p.t.length * Math.min(1, p.c / 40), 0), // compara leituras da mesma linha
+    duvidoso: todas.length !== pals.length || pals.some(p => p.c < 70 || (h && p.h > h * 1.5)),
+    h, yc: boas.length ? boas.reduce((s, p) => s + p.y, 0) / boas.length : null
+  };
+}
+async function lerTextoEtiqueta(fonte, completo) {
   const w = await prepararOCR();
-  const c = canvasReduzido(fonte, 1600);
+  // até 1600 px; recorte pequeno é AMPLIADO (letras pequenas demais confundem a leitura)
+  const w0 = fonte.width, h0 = fonte.height, e = Math.min(2, 1600 / Math.max(w0, h0));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w0 * e)); c.height = Math.max(1, Math.round(h0 * e));
+  const cx = c.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(fonte, 0, 0, c.width, c.height);
+  const palavrasDe = l => (l.words || []).map(x => ({ t: x.text, h: x.bbox.y1 - x.bbox.y0, y: (x.bbox.y0 + x.bbox.y1) / 2, c: x.confidence }));
   const { data } = await w.recognize(c, {}, { text: true, blocks: true });
   const linhas = [];
   (data.blocks || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => {
-    linhas.push({ texto: String(l.text || '').trim(), conf: l.confidence, palavras: (l.words || []).map(x => ({ t: x.text, h: x.bbox.y1 - x.bbox.y0, c: x.confidence })) });
+    linhas.push({ texto: String(l.text || '').trim(), conf: l.confidence, palavras: palavrasDe(l) });
   })));
   if (!linhas.length && data.text) data.text.split('\n').forEach(t => linhas.push({ texto: t.trim(), conf: 70, palavras: [] }));
-  return interpretarTextoEtiqueta(linhas);
+  let r = interpretarTextoEtiqueta(linhas);
+  if (completo) { // etiqueta sem código 2D: 2ª leitura com mais contraste (reflexo do plástico) e junta as duas
+    try {
+      const k = document.createElement('canvas'); k.width = c.width; k.height = c.height;
+      const kx = k.getContext('2d'); kx.filter = 'grayscale(1) contrast(1.6)'; kx.drawImage(c, 0, 0);
+      const { data: d2 } = await w.recognize(k, {}, { blocks: true });
+      const l2 = [];
+      (d2.blocks || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => l2.push({ texto: String(l.text || '').trim(), conf: l.confidence, palavras: palavrasDe(l) }))));
+      r = juntarLeiturasTexto(r, interpretarTextoEtiqueta(l2));
+    } catch (e) { registrarErro('leitor: 2ª leitura', e); }
+  }
+  // Nome com palavra duvidosa (risco de caneta, reflexo…): lê de novo só a faixa do nome, ampliada, e fica com a melhor leitura
+  const n = r._nome;
+  if (n && n.duvidoso && n.h && n.yc != null) {
+    const versoes = [n];
+    try {
+      const y0 = Math.max(0, n.yc - n.h * 1.1), y1 = Math.min(c.height, n.yc + n.h * 1.1);
+      const faixa = document.createElement('canvas');
+      faixa.width = c.width * 2; faixa.height = Math.max(1, Math.round((y1 - y0) * 2));
+      const fx = faixa.getContext('2d'); fx.imageSmoothingQuality = 'high';
+      fx.drawImage(c, 0, y0, c.width, y1 - y0, 0, 0, faixa.width, faixa.height);
+      for (const modo of ['7', '6']) { // 7 = uma linha só; 6 = bloco de texto
+        await w.setParameters({ tessedit_pageseg_mode: modo });
+        const { data: d2 } = await w.recognize(faixa, {}, { blocks: true });
+        const pal = [];
+        (d2.blocks || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => pal.push(...palavrasDe(l)))));
+        const v = nomeDaLinha({ texto: pal.map(p => p.t).join(' '), conf: 100, palavras: pal });
+        if (v) versoes.push(v);
+      }
+    } catch (e) { registrarErro('leitor: 2ª leitura do nome', e); }
+    finally { try { await w.setParameters({ tessedit_pageseg_mode: '11' }); } catch (e) {} }
+    const consenso = consensoNome(versoes);
+    versoes.sort((a, b) => b.qualidade - a.qualidade);
+    r.nome = capitalizarNome(consenso.split(' ').length >= 2 ? consenso : versoes[0].texto);
+  }
+  return r;
+}
+// Duas leituras do texto: campo igual nas duas = certo; diferente = fica a mais completa e marca para conferir
+function juntarLeiturasTexto(a, b) {
+  const r = { ...a }, duvida = new Set();
+  ['lote', 'tonalidade', 'bitola', 'caixasPorPallet', 'm2PorCaixa', 'gtin', 'sscc', 'tamanho'].forEach(k => {
+    const x = a[k], y = b[k];
+    if (!x && y) r[k] = y;
+    else if (x && y && x !== y) {
+      if (k === 'lote' && (y.includes(x) || x.includes(y))) r[k] = y.length > x.length ? y : x;
+      else duvida.add(k);
+    }
+  });
+  // lote e tonalidade: vota entre todas as ocorrências das duas leituras (letra grande e pequena)
+  ['lote', 'tonalidade'].forEach(k => {
+    const todos = [...((a.candidatos || {})[k] || []), ...((b.candidatos || {})[k] || [])];
+    if (!todos.length) return;
+    const cont = {}, conf = {};
+    todos.forEach(v => { const t = String(v); cont[t] = (cont[t] || 0) + 1; conf[t] = Math.max(conf[t] || 0, v.conf || 0); });
+    const ordem = Object.keys(cont).sort((x, y) => cont[y] - cont[x] || conf[y] - conf[x]); // mais vezes; empate → letra mais nítida
+    r[k] = ordem[0];
+    if (ordem.length > 1) duvida.add(k); else duvida.delete(k);
+  });
+  if (!r.nome && b.nome) r.nome = b.nome;
+  if (a._nome) Object.defineProperty(r, '_nome', { value: a._nome, enumerable: false });
+  else if (b._nome) Object.defineProperty(r, '_nome', { value: b._nome, enumerable: false });
+  Object.defineProperty(r, 'duvidas', { value: duvida, enumerable: false });
+  return r;
+}
+// Junta as leituras do nome: só fica a palavra que aparece em pelo menos 2 leituras (sujeira muda a cada leitura; a palavra certa se repete)
+function consensoNome(versoes) {
+  const lista = versoes.filter(v => v && v.pals && v.pals.length);
+  if (!lista.length) return '';
+  if (lista.length < 2) return lista[0].texto;
+  const comComplemento = (curta, longa) => curta.length >= 3 && longa.startsWith(curta) && /^[-\/.]/.test(longa.slice(curta.length)); // "CINZA" × "CINZA-84"
+  const parecida = (a, b) => semelhanca(a, b) >= 0.7 || comComplemento(a, b) || comComplemento(b, a) || (Math.min(a.length, b.length) >= 3 && Math.abs(a.length - b.length) <= 2 && (a.includes(b) || b.includes(a)));
+  const grupos = [];
+  lista.forEach((v, iv) => v.pals.forEach((p, ip) => {
+    const T = p.t.toUpperCase();
+    let g = grupos.find(g => !g.pos.has(iv) && g.formas.some(f => parecida(f.T, T)));
+    if (!g) { g = { formas: [], pos: new Map() }; grupos.push(g); }
+    g.formas.push({ t: p.t, T, c: p.c }); g.pos.set(iv, ip);
+  }));
+  const bons = grupos.filter(g => g.pos.size >= 2);
+  // ordem das palavras: a maioria das leituras decide quem vem antes
+  bons.sort((a, b) => {
+    let antes = 0;
+    a.pos.forEach((ia, iv) => { if (b.pos.has(iv)) antes += ia < b.pos.get(iv) ? -1 : 1; });
+    return antes;
+  });
+  const forma = g => {
+    const cont = {}; g.formas.forEach(f => { cont[f.T] = (cont[f.T] || 0) + 1; });
+    const completa = f => g.formas.filter(o => comComplemento(o.T, f.T)).length;                                       // "CINZA-84" completa "CINZA"
+    const contida = f => g.formas.filter(o => o.T !== f.T && o.T.includes(f.T) && !comComplemento(f.T, o.T)).length; // "AREZZO" dentro de "VAREZZO": letra a mais é o risco
+    return [...g.formas].sort((x, y) => (completa(y) - completa(x)) || (cont[y.T] - cont[x.T]) || (contida(y) - contida(x)) || (y.c - x.c))[0].t;
+  };
+  return bons.map(forma).join(' ');
 }
 
 // ---------- Tela da câmera ----------
@@ -5112,6 +5409,9 @@ function pararCameraLeitor() {
   _leitor.luz = false;
   const bl = document.getElementById('leitor-btn-luz');
   if (bl) { bl.style.display = 'none'; bl.classList.remove('luz-ligada'); }
+  const bt = document.getElementById('leitor-btn-texto');
+  if (bt) bt.style.display = 'none';
+  _leitor.manual = null;
 }
 function fecharLeitorEtiqueta() {
   _leitor.sessao++;
@@ -5120,7 +5420,9 @@ function fecharLeitorEtiqueta() {
   pararCameraLeitor();
   if (_leitor.pularOCR) { const f = _leitor.pularOCR; _leitor.pularOCR = null; f(); }
   _leitor.ocrProgresso = null;
-  document.getElementById('leitor-etiqueta').classList.remove('aberto', 'congelado');
+  _leitor.revisao = null;
+  _leitor.alvo = null;
+  document.getElementById('leitor-etiqueta').classList.remove('aberto', 'congelado', 'revisando');
 }
 function pularLeituraNome() { if (_leitor.pularOCR) { const f = _leitor.pularOCR; _leitor.pularOCR = null; f(); } }
 async function alternarLanternaLeitor() {
@@ -5139,9 +5441,10 @@ async function abrirLeitorEtiqueta() {
   const tela = document.getElementById('leitor-etiqueta');
   const sessao = ++_leitor.sessao;
   pararCameraLeitor();
-  Object.assign(_leitor, { aberto: true, parcial: {}, pularOCR: null, ocrProgresso: null });
-  tela.classList.remove('congelado');
+  Object.assign(_leitor, { aberto: true, parcial: {}, pularOCR: null, ocrProgresso: null, alvo: null, revisao: null, manual: null, semDados: 0, inicioBusca: 0 });
+  tela.classList.remove('congelado', 'revisando');
   tela.classList.add('aberto');
+  marcarGuia('');
   document.getElementById('leitor-btn-pular').style.display = 'none';
   document.getElementById('leitor-btn-foto').style.display = '';
   try { const AC = window.AudioContext || window.webkitAudioContext; if (AC && !_leitor.audio) _leitor.audio = new AC(); if (_leitor.audio) _leitor.audio.resume(); } catch (e) {}
@@ -5185,34 +5488,160 @@ async function abrirLeitorEtiqueta() {
   if (sessao !== _leitor.sessao) return;
   leitorStatus('🔍 Aponte para o código quadrado (2D) da etiqueta');
   _leitor.rodando = true;
+  _leitor.inicioBusca = Date.now();
+  document.getElementById('leitor-btn-texto').style.display = 'block';
   cicloLeitor(sessao);
+}
+// Captura só com a etiqueta PERTO e PARADA: lê o mesmo código por um tempo e fica com a imagem mais nítida
+const LEITOR_TAM_MIN = 0.11;     // código 2D com pelo menos ~11% do lado menor da imagem (senão: "aproxime mais")
+const LEITOR_SEGURAR_MS = 1000;  // tempo segurando a etiqueta antes de capturar
+const LEITOR_LONGE_MS = 3500;    // longe por este tempo → captura assim mesmo (etiquetas com código pequeno)
+function marcarGuia(estado) {
+  const g = document.getElementById('leitor-guia');
+  if (g) g.className = estado || '';
+}
+// Retângulo da moldura em pixels do vídeo (o vídeo aparece inteiro na tela: object-fit contain)
+function regiaoGuiaNoVideo(video) {
+  const vw = video.videoWidth, vh = video.videoHeight, tudo = { x: 0, y: 0, w: vw, h: vh };
+  const area = document.getElementById('leitor-area').getBoundingClientRect(), g = document.getElementById('leitor-guia').getBoundingClientRect();
+  if (!area.width || !g.width) return tudo;
+  const esc = Math.min(area.width / vw, area.height / vh);
+  const ox = area.left + (area.width - vw * esc) / 2, oy = area.top + (area.height - vh * esc) / 2;
+  const fx = g.width * 0.1, fy = g.height * 0.1;
+  const x0 = Math.max(0, (g.left - fx - ox) / esc), y0 = Math.max(0, (g.top - fy - oy) / esc);
+  const x1 = Math.min(vw, (g.right + fx - ox) / esc), y1 = Math.min(vh, (g.bottom + fy - oy) / esc);
+  if (x1 - x0 < vw * 0.3 || y1 - y0 < vh * 0.2) return tudo;
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+// Área para ler o texto: a moldura + a vizinhança do código 2D (caso a etiqueta esteja fora do centro)
+function regiaoParaOCR(largura, altura, achado, base) {
+  if (!achado || !achado.tam) return base || { x: 0, y: 0, w: largura, h: altura };
+  const s = Math.min(largura, altura), cx = achado.cx * s, cy = achado.cy * s, t = achado.tam * s;
+  let x0 = cx - 4.5 * t, y0 = cy - 3.5 * t, x1 = cx + 4.5 * t, y1 = cy + 3.5 * t; // em volta do código 2D
+  if (base) { x0 = Math.min(x0, base.x); y0 = Math.min(y0, base.y); x1 = Math.max(x1, base.x + base.w); y1 = Math.max(y1, base.y + base.h); }
+  x0 = Math.max(0, x0); y0 = Math.max(0, y0); x1 = Math.min(largura, x1); y1 = Math.min(altura, y1);
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+function recortarCanvas(src, r) {
+  if (!r || (r.x <= 0 && r.y <= 0 && r.w >= src.width && r.h >= src.height)) return src;
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(r.w)); c.height = Math.max(1, Math.round(r.h));
+  c.getContext('2d').drawImage(src, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+  return c;
+}
+// Nitidez (variação do contorno das letras): imagem tremida/fora de foco dá número baixo
+function nitidezRegiao(canvas, r) {
+  const W = 480, H = Math.max(8, Math.round(W * r.h / r.w));
+  const c = _leitor.cvNitidez || (_leitor.cvNitidez = document.createElement('canvas'));
+  c.width = W; c.height = H;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, W, H);
+  const d = x.getImageData(0, 0, W, H).data, g = new Float32Array(W * H);
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) g[j] = d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+  let soma = 0, soma2 = 0, n = 0;
+  for (let yy = 1; yy < H - 1; yy++) for (let xx = 1; xx < W - 1; xx++) {
+    const k = yy * W + xx, l = 4 * g[k] - g[k - 1] - g[k + 1] - g[k - W] - g[k + W];
+    soma += l; soma2 += l * l; n++;
+  }
+  const m = soma / n;
+  return soma2 / n - m * m;
 }
 async function cicloLeitor(sessao) {
   if (sessao !== _leitor.sessao || !_leitor.rodando) return;
   const video = document.getElementById('leitor-video');
   try {
     if (video.readyState >= 2 && video.videoWidth) {
-      _leitor.quadroLeve = canvasReduzido(video, 1280, _leitor.quadroLeve);
-      const textos = await detectarCodigos(_leitor.motorPronto, _leitor.quadroLeve);
+      // o mesmo instante do vídeo em resolução cheia (para o texto) e reduzido (para achar o código)
+      const cheio = _leitor.candidato || (_leitor.candidato = document.createElement('canvas'));
+      if (cheio.width !== video.videoWidth) cheio.width = video.videoWidth;
+      if (cheio.height !== video.videoHeight) cheio.height = video.videoHeight;
+      cheio.getContext('2d').drawImage(video, 0, 0, cheio.width, cheio.height);
+      const c = _leitor.quadroLeve = canvasReduzido(video, 1280, _leitor.quadroLeve);
+      const codigos = await detectarCodigos(_leitor.motorPronto, c);
+      const achado = escolherEtiqueta(codigos, c.width, c.height);
       if (sessao !== _leitor.sessao || !_leitor.rodando) return;
-      if (textos.length) {
-        Object.assign(_leitor.parcial, interpretarCodigos(textos));
-        if (_leitor.parcial.gtin) { _leitor.rodando = false; await concluirLeituraVideo(sessao, video); return; }
-        if (_leitor.parcial.sscc) leitorStatus('👍 Li o código de barras do pallet. Agora aponte para o código quadrado (2D).');
-      }
+      await tratarQuadroLeitor(sessao, video, c, cheio, achado, codigos.length);
     }
   } catch (e) { registrarErro('leitor: quadro', e); }
-  if (sessao === _leitor.sessao && _leitor.rodando) _leitor.timer = setTimeout(() => cicloLeitor(sessao), 150);
+  if (sessao === _leitor.sessao && _leitor.rodando) _leitor.timer = setTimeout(() => cicloLeitor(sessao), 120);
 }
-async function concluirLeituraVideo(sessao, video) {
-  // congela a imagem em resolução cheia: é dela que sai o nome, se precisar
+async function tratarQuadroLeitor(sessao, video, c, cheio, achado, qtdCodigos) {
+  const agora = Date.now();
+  const e = c.width / video.videoWidth;
+  // guarda o quadro mais nítido (troca os canvas, sem copiar)
+  const guardarSeMelhor = (a, regiaoBase, geo) => {
+    const n = nitidezRegiao(c, { x: regiaoBase.x * e, y: regiaoBase.y * e, w: regiaoBase.w * e, h: regiaoBase.h * e });
+    if (n <= a.nitidez) return;
+    a.nitidez = n;
+    a.regiao = regiaoParaOCR(video.videoWidth, video.videoHeight, geo, regiaoBase);
+    const velho = a.melhor; a.melhor = cheio; _leitor.candidato = velho || null;
+    return true;
+  };
+  // ---- Leitura pelo TEXTO (etiqueta sem código 2D: botão "Ler pelo texto" ou automático) ----
+  if (_leitor.manual) {
+    const m = _leitor.manual, guia = regiaoGuiaNoVideo(video);
+    m.leituras++;
+    if (guardarSeMelhor(m, guia, achado && achado.dados.gtin ? achado : null)) {
+      m.dados = achado ? { ...achado.dados } : {};
+      if (!m.dados.gtin) m.regiao = null; // lendo pelo texto: imagem inteira (etiquetas em pé não cabem na moldura deitada)
+    }
+    const passou = agora - m.inicio;
+    marcarGuia('segurando');
+    leitorStatus('📸 Segure firme… lendo a etiqueta pelo texto', Math.min(1, passou / 800));
+    if (passou >= 800 && m.leituras >= 3) { _leitor.manual = null; await concluirCapturaLeitor(sessao, m.melhor, m.dados || {}, m.regiao); }
+    return;
+  }
+  if (!achado || !achado.dados.gtin) {
+    const al = _leitor.alvo;
+    if (al && ++al.falhas > 6) { _leitor.alvo = null; marcarGuia(''); }
+    // vê códigos de barras, mas nenhum com os dados do produto (ex.: só números internos da fábrica): lê pelo texto
+    if (qtdCodigos > 0) {
+      if (!_leitor.semDados) _leitor.semDados = agora;
+      else if (agora - _leitor.semDados > 2000) { _leitor.semDados = 0; iniciarLeituraTexto(true); return; }
+      leitorStatus(achado && achado.dados.sscc ? '👍 Li o código do pallet. Procurando os dados do produto…' : '🔍 Esta etiqueta não tem código 2D: já vou ler pelo texto, segure firme…');
+    } else {
+      _leitor.semDados = 0;
+      if (!_leitor.alvo && agora - (_leitor.inicioBusca || agora) > 4000) leitorStatus('🔍 Aponte para o código quadrado (2D). Etiqueta sem código 2D? Toque em “📸 Ler texto”.');
+    }
+    return;
+  }
+  _leitor.semDados = 0;
+  if (!_leitor.alvo || _leitor.alvo.chave !== achado.chave) {
+    _leitor.alvo = { chave: achado.chave, inicio: agora, leituras: 0, falhas: 0, nitidez: -1, longeDesde: 0, melhor: null };
+  }
+  const a = _leitor.alvo;
+  a.falhas = 0;
+  if (achado.tam < LEITOR_TAM_MIN) {
+    if (!a.longeDesde) a.longeDesde = agora;
+    if (agora - a.longeDesde < LEITOR_LONGE_MS) {
+      a.inicio = agora; a.leituras = 0; // o tempo segurando só conta com a etiqueta perto
+      marcarGuia('longe');
+      leitorStatus('🔎 Achei a etiqueta. Aproxime mais: ela deve encher a moldura.');
+      return;
+    }
+  } else a.longeDesde = 0;
+  a.leituras++;
+  if (guardarSeMelhor(a, regiaoGuiaNoVideo(video), achado)) a.dados = achado.dados;
+  const passou = agora - a.inicio;
+  marcarGuia('segurando');
+  leitorStatus('✋ Código encontrado — segure firme…', Math.min(1, passou / LEITOR_SEGURAR_MS));
+  if (passou >= LEITOR_SEGURAR_MS && a.leituras >= 3) { _leitor.alvo = null; await concluirCapturaLeitor(sessao, a.melhor, a.dados, a.regiao); }
+}
+function iniciarLeituraTexto(automatico) {
+  if (!_leitor.rodando) { if (!_leitor.stream) escolherFotoLeitor(); return; }
+  _leitor.alvo = null;
+  _leitor.manual = { inicio: Date.now(), leituras: 0, nitidez: -1, melhor: null, dados: {}, automatico: !!automatico };
+}
+async function concluirCapturaLeitor(sessao, melhor, dados, regiao) {
+  _leitor.rodando = false;
   const quadro = document.getElementById('leitor-quadro');
-  quadro.width = video.videoWidth; quadro.height = video.videoHeight;
-  quadro.getContext('2d').drawImage(video, 0, 0, quadro.width, quadro.height);
+  quadro.width = melhor.width; quadro.height = melhor.height;
+  quadro.getContext('2d').drawImage(melhor, 0, 0);
   document.getElementById('leitor-etiqueta').classList.add('congelado');
   pararCameraLeitor();
   bipLeitor();
-  await finalizarEtiqueta(sessao, quadro);
+  _leitor.parcial = { ...dados };
+  await finalizarEtiqueta(sessao, recortarCanvas(quadro, regiao));
 }
 function abrirImagemArquivo(arq) {
   return new Promise((ok, falha) => {
@@ -5244,38 +5673,47 @@ async function lerEtiquetaDeArquivo(ev) {
   _leitor.semInternet = false;
   try { motor = await obterMotorLeitor(); } catch (e) { registrarErro('leitor: carregar', e); _leitor.semInternet = true; }
   if (sessao !== _leitor.sessao) return;
+  let regiao = null;
   if (motor) {
     try {
-      let textos = await detectarCodigos(motor, canvasReduzido(grande, 1600));
-      if (!textos.length && Math.max(grande.width, grande.height) > 1600) textos = await detectarCodigos(motor, grande);
-      Object.assign(_leitor.parcial, interpretarCodigos(textos));
+      let c = canvasReduzido(grande, 1600);
+      let achado = escolherEtiqueta(await detectarCodigos(motor, c), c.width, c.height);
+      if (!achado && Math.max(grande.width, grande.height) > 1600) { c = grande; achado = escolherEtiqueta(await detectarCodigos(motor, grande), grande.width, grande.height); }
+      if (achado) { _leitor.parcial = { ...achado.dados }; regiao = regiaoParaOCR(grande.width, grande.height, achado, null); }
     } catch (e) { registrarErro('leitor: foto', e); }
   }
   if (sessao !== _leitor.sessao) return;
   if (_leitor.parcial.gtin) bipLeitor();
-  await finalizarEtiqueta(sessao, grande);
+  await finalizarEtiqueta(sessao, recortarCanvas(grande, regiao));
 }
 async function finalizarEtiqueta(sessao, foto) {
   const dados = { ..._leitor.parcial };
-  let prod = produtoPorGtin(dados.gtin);
+  let prod = produtoPorGtin(dados.gtin) || produtoPorCodigos(dados.codigosEtiqueta);
   let ocr = null;
-  if (!prod || !prod.nome || !prod.tamanho) {
+  const doTexto = new Set(); // campos que vieram da leitura do texto (pedem conferência)
+  if (!prod || !prod.nome || !prod.tamanho || !dados.lote) {
     // piso ainda desconhecido: lê o nome e o formato na foto
     document.getElementById('leitor-btn-pular').style.display = 'block';
     document.getElementById('leitor-btn-foto').style.display = 'none';
-    leitorStatus(dados.gtin ? '📖 Piso novo: lendo o nome na etiqueta…' : '📖 Não achei o código 2D. Lendo o texto da etiqueta…');
+    leitorStatus(dados.lote ? '📖 Piso novo: lendo o nome na etiqueta…' : '📖 Lendo a etiqueta pelo texto…');
     _leitor.ocrProgresso = m => { if (sessao === _leitor.sessao) leitorProgressoOCR(m); };
     try {
-      ocr = await Promise.race([lerTextoEtiqueta(foto), new Promise(res => { _leitor.pularOCR = () => res(null); })]);
+      ocr = await Promise.race([lerTextoEtiqueta(foto, !dados.lote), new Promise(res => { _leitor.pularOCR = () => res(null); })]);
     } catch (e) { registrarErro('leitor: ler nome', e); ocr = null; if (/sem internet/.test(e && e.message)) _leitor.semInternet = true; }
     _leitor.pularOCR = null; _leitor.ocrProgresso = null;
     if (sessao !== _leitor.sessao) return;
     if (ocr) {
-      if (!dados.gtin && ocr.gtin) { dados.gtin = ocr.gtin; prod = produtoPorGtin(ocr.gtin); }
+      if (!dados.gtin && ocr.gtin) { dados.gtin = ocr.gtin; prod = produtoPorGtin(ocr.gtin) || prod; }
       if (!dados.sscc && ocr.sscc) dados.sscc = ocr.sscc;
+      ['lote', 'tonalidade', 'bitola', 'caixasPorPallet', 'm2PorCaixa'].forEach(k => { if (!dados[k] && ocr[k]) { dados[k] = ocr[k]; doTexto.add(k); } });
     }
   }
   if (sessao !== _leitor.sessao) return;
+  // formato lido: fica com o que bate com o m² da caixa (se houver mais de um "NNxNN" na etiqueta)
+  if (ocr && ocr.tamanhos && dados.m2PorCaixa) {
+    const certo = ocr.tamanhos.find(t => tamanhoConfereComM2(t, dados.m2PorCaixa));
+    if (certo) ocr.tamanho = certo;
+  }
   const porNome = (!prod || !prod.nome) && ocr && ocr.nome ? produtoPorNome(ocr.nome, (prod && prod.tamanho) || ocr.tamanho) : null;
   const v = {
     nome: (prod && prod.nome) || (porNome && porNome.nome) || (ocr && ocr.nome) || '',
@@ -5286,8 +5724,72 @@ async function finalizarEtiqueta(sessao, foto) {
     caixasPorPallet: dados.caixasPorPallet || '', m2PorCaixa: dados.m2PorCaixa || ''
   };
   const origem = prod && prod.nome ? 'conhecido' : porNome ? 'nome' : (ocr && ocr.nome) ? 'foto' : 'nenhum';
+  if (!dados.gtin && !v.nome && !v.lote) { // não deu para ler nada: fica na tela para tentar de novo
+    document.getElementById('leitor-btn-pular').style.display = 'none';
+    document.getElementById('leitor-btn-foto').style.display = '';
+    leitorStatus(_leitor.semInternet
+      ? '📶 Sem internet para baixar o leitor (só na 1ª vez). Conecte e tente de novo.'
+      : '⚠️ Não consegui ler esta etiqueta. Tente de novo mais perto, parado e com luz — ou use outra foto.');
+    return;
+  }
+  mostrarRevisaoEtiqueta(v, dados, origem, doTexto, ocr && ocr.duvidas ? new Set([...ocr.duvidas].filter(k => doTexto.has(k) || k === 'tamanho')) : null);
+}
+
+// ---------- Conferência da leitura (antes de ir para o formulário) ----------
+function mostrarRevisaoEtiqueta(v, dados, origem, doTexto, duvidas) {
+  doTexto = doTexto || new Set(); duvidas = duvidas || new Set();
+  _leitor.revisao = { v, dados, origem };
+  const e = escEtiqueta, tela = document.getElementById('leitor-etiqueta'), box = document.getElementById('leitor-revisao');
+  const selo = {
+    conhecido: '<em class="ok">✅ já cadastrado</em>',
+    nome: `<em class="ok">🔎 igual a um piso já lançado</em>`,
+    foto: '<em class="atencao">📖 lido da foto — confira</em>',
+    nenhum: '<em class="atencao">✍️ digite o nome</em>'
+  }[origem] || '';
+  const avisos = [];
+  if (tamanhoConfereComM2(v.tamanho, v.m2PorCaixa) === false) avisos.push(`⚠️ O formato ${e(v.tamanho)} não bate com ${e(String(v.m2PorCaixa).replace('.', ','))} m² por caixa. Confira o formato.`);
+  if (!v.tamanho) avisos.push('✍️ Não consegui ler o formato: digite (ex.: 90x90).');
+  const rep = dados.sscc && confFormModo !== 'quebras' ? carregarConferencia().find(i => i && i.sscc === dados.sscc) : null;
+  if (rep) avisos.push(`⚠️ Este pallet (mesmo SSCC) já foi lançado: ${e(rep.nome)}${rep.endereco ? ' em ' + e(rep.endereco) : ''}${rep.responsavel ? ' por ' + e(rep.responsavel) : ''}.`);
+  // todos os campos podem ser corrigidos aqui; amarelo = lido do texto (confira), vermelho = as leituras discordaram
+  const campo = (rotulo, k, valor, ph, modo) => {
+    const cls = duvidas.has(k) ? ' duvida' : doTexto.has(k) ? ' do-texto' : '';
+    const marca = duvidas.has(k) ? ' · confira!' : doTexto.has(k) ? ' · texto' : '';
+    return `<label class="rev-campo${cls}"><span>${rotulo}${marca}</span><input id="rev-${k}" value="${e(valor || '')}" placeholder="${ph}" autocomplete="off" ${modo ? `inputmode="${modo}"` : ''} enterkeyhint="done" onkeydown="if(event.key==='Enter')usarLeituraEtiqueta()"></label>`;
+  };
+  if (duvidas.size) avisos.unshift('⚠️ Algumas letras ficaram em dúvida: confira os campos em vermelho olhando a etiqueta.');
+  else if (doTexto.size) avisos.unshift('📖 Etiqueta lida pelo texto: confira os campos em amarelo.');
+  box.innerHTML = `
+    <div class="rev-titulo">Confira a leitura</div>
+    <label class="rev-campo"><span>Nome do piso ${selo}</span>
+      <input id="rev-nome" value="${e(v.nome)}" placeholder="Digite o nome do piso" autocomplete="off" enterkeyhint="done" onkeydown="if(event.key==='Enter')usarLeituraEtiqueta()"></label>
+    <div class="rev-grade">
+      ${campo('Formato', 'tamanho', v.tamanho, 'Ex: 90x90')}
+      ${campo('m²/caixa', 'm2PorCaixa', v.m2PorCaixa ? String(v.m2PorCaixa).replace('.', ',') : '', '2,40', 'decimal')}
+      ${campo('Cx/pallet', 'caixasPorPallet', v.caixasPorPallet, '0', 'numeric')}
+      ${campo('Lote', 'lote', v.lote, '—')}${campo('Tonalidade', 'tonalidade', v.tonalidade, '—')}${campo('Bitola', 'bitola', v.bitola, '—')}
+    </div>
+    ${v.marca || v.codigo ? `<div class="rev-sub">Marca <b>${e(v.marca || '—')}</b> · Código <b>${e(v.codigo || '—')}</b></div>` : ''}
+    ${avisos.map(t => `<div class="rev-aviso">${t}</div>`).join('')}
+    <div class="rev-botoes">
+      <button type="button" id="rev-btn-denovo" onclick="abrirLeitorEtiqueta()">🔄 Ler de novo</button>
+      <button type="button" id="rev-btn-usar" class="rev-usar" onclick="usarLeituraEtiqueta()">✅ Usar</button>
+    </div>`;
+  tela.classList.add('revisando');
+}
+function usarLeituraEtiqueta() {
+  const r = _leitor.revisao;
+  if (!r) return;
+  const v = { ...r.v };
+  let origem = r.origem;
+  const val = k => (document.getElementById('rev-' + k)?.value || '').trim();
+  const nome = val('nome');
+  if (nome !== v.nome) { v.nome = nome; origem = 'digitado'; }
+  ['tamanho', 'lote', 'tonalidade', 'bitola', 'caixasPorPallet'].forEach(k => { v[k] = val(k); });
+  const m2 = val('m2PorCaixa').replace(',', '.');
+  v.m2PorCaixa = m2 && !isNaN(parseFloat(m2)) ? String(parseFloat(m2)) : '';
   fecharLeitorEtiqueta();
-  preencherFormComEtiqueta(v, dados, origem);
+  preencherFormComEtiqueta(v, r.dados, origem);
 }
 
 // ---------- Preenche o formulário ----------
@@ -5309,7 +5811,7 @@ function preencherFormComEtiqueta(v, dados, origem) {
     if (v[k]) el.classList.add('campo-lido');
     else if (k === 'nome' || k === 'marca' || k === 'codigo') el.classList.add('campo-faltou');
   });
-  confEtiquetaAtual = { gtin: dados.gtin || '', sscc: dados.sscc || '' };
+  confEtiquetaAtual = { gtin: dados.gtin || '', sscc: dados.sscc || '', codigos: (dados.codigosEtiqueta || []).join(',') };
   calcularTotalConf();
   renderInfoEtiqueta(v, dados, origem);
   const alvo = document.getElementById(v.nome ? 'conf_endereco' : 'conf_nome');
@@ -7475,7 +7977,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('mapa-viewport')?.classList.contains('tela-cheia') && !document.getElementById('mapa-folha')) alternarTelaCheiaMapa();
 });
 
-const VERSAO_APP = '2026.11.24a';
+const VERSAO_APP = '2026.11.24b';
 // ----- Aviso de versão nova (aba aberta há muito tempo no PC continuaria com a versão antiga) -----
 let _ultimaChecagemVersao = 0;
 async function checarNovaVersao() {
