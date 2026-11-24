@@ -1634,6 +1634,42 @@ PASSOS PARA RODAR NO GITHUB PAGES:
     .diag-btn { border:1.5px solid #d0c9bb; background:#fff; border-radius:8px; padding:7px 10px; font-size:12px; font-weight:700; cursor:pointer; color:var(--texto); }
     html.tema-escuro .diag-box { background:#1f2a1f; }
     html.tema-escuro .diag-btn { background:#111811; border-color:#334033; }
+
+    /* ===== Leitor de etiqueta (código 2D + nome por foto) ===== */
+    .btn-ler-etiqueta { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:14px 12px; margin-bottom:12px; border:none; border-radius:10px; background:#1f4e79; color:#fff; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(31,78,121,.3); -webkit-tap-highlight-color:transparent; }
+    .btn-ler-etiqueta:active { transform:scale(.98); }
+    #leitor-etiqueta { position:fixed; left:0; right:0; top:0; height:100vh; height:100dvh; z-index:100500; background:#000; display:none; flex-direction:column; color:#fff; }
+    #leitor-etiqueta.aberto { display:flex; }
+    #leitor-area { position:relative; flex:1; min-height:0; overflow:hidden; background:#000; container-type:size; }
+    #leitor-video, #leitor-quadro { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+    #leitor-quadro { display:none; background:#000; }
+    #leitor-etiqueta.congelado #leitor-quadro { display:block; }
+    #leitor-etiqueta.congelado #leitor-video { visibility:hidden; }
+    #leitor-guia { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:88%; width:min(88cqw, calc(80cqh * 4 / 3)); aspect-ratio:4/3; border:3px solid rgba(255,255,255,.9); border-radius:16px; box-shadow:0 0 0 100vmax rgba(0,0,0,.32); pointer-events:none; transition:border-color .2s; }
+    #leitor-etiqueta.congelado #leitor-guia { border-color:#4caf50; box-shadow:none; }
+    #leitor-dica { position:absolute; left:0; right:0; top:14px; z-index:1; text-align:center; font-size:14px; font-weight:700; text-shadow:0 1px 4px #000; pointer-events:none; }
+    #leitor-status { padding:12px 16px; text-align:center; font-size:15px; line-height:1.4; background:#111; min-height:44px; }
+    #leitor-status .leitor-barra { height:6px; border-radius:3px; background:#333; margin:8px auto 0; max-width:280px; overflow:hidden; }
+    #leitor-status .leitor-barra > div { height:100%; background:#4caf50; width:0; transition:width .2s; }
+    .leitor-botoes { display:flex; gap:8px; padding:10px 12px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); background:#111; }
+    .leitor-botoes button { flex:1; padding:13px 6px; border:none; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:#2b2b2b; color:#fff; }
+    .leitor-botoes button.luz-ligada { background:#f9a825; color:#000; }
+    #leitor-btn-pular { display:none; background:#1f4e79; }
+    .campo-lido { background:#e8f5e9 !important; border-color:#43a047 !important; }
+    .campo-faltou { background:#fff8e1 !important; border-color:#f9a825 !important; }
+    html.tema-escuro .campo-lido { background:#16301a !important; border-color:#43a047 !important; }
+    html.tema-escuro .campo-faltou { background:#33290c !important; border-color:#c79100 !important; }
+    #conf-etiqueta-info { border:1.5px solid #43a047; background:#f1f8f1; border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:13px; line-height:1.5; position:relative; }
+    #conf-etiqueta-info .eti-titulo { font-weight:800; color:#2e7d32; padding-right:26px; }
+    #conf-etiqueta-info .eti-codigos { font-size:11.5px; color:var(--texto-suave); word-break:break-all; }
+    #conf-etiqueta-info .eti-aviso { margin-top:6px; padding:6px 8px; border-radius:7px; background:#fff8e1; color:#6d4c00; }
+    #conf-etiqueta-info .eti-aviso.perigo { background:#fdecea; color:#a12a1e; }
+    #conf-etiqueta-info .eti-fechar { position:absolute; top:6px; right:6px; width:26px; height:26px; border:none; border-radius:50%; background:rgba(0,0,0,.08); font-size:13px; cursor:pointer; color:inherit; }
+    html.tema-escuro #conf-etiqueta-info { background:#16241a; border-color:#3e8e41; }
+    html.tema-escuro #conf-etiqueta-info .eti-titulo { color:#7fd37f; }
+    html.tema-escuro #conf-etiqueta-info .eti-aviso { background:#33290c; color:#f3d58a; }
+    html.tema-escuro #conf-etiqueta-info .eti-aviso.perigo { background:#3a1d1a; color:#f4a59b; }
+    html.tema-escuro #conf-etiqueta-info .eti-fechar { background:rgba(255,255,255,.1); }
 </style>
 </head>
 <body>
@@ -2320,6 +2356,24 @@ PASSOS PARA RODAR NO GITHUB PAGES:
 </div>
 
 <!-- ===================== MODAL DETALHE ===================== -->
+<!-- ===================== LEITOR DE ETIQUETA (câmera) ===================== -->
+<div id="leitor-etiqueta" role="dialog" aria-modal="true" aria-label="Ler etiqueta do pallet">
+  <div id="leitor-area">
+    <video id="leitor-video" playsinline muted autoplay></video>
+    <canvas id="leitor-quadro"></canvas>
+    <div id="leitor-dica">Enquadre a etiqueta inteira</div>
+    <div id="leitor-guia"></div>
+  </div>
+  <div id="leitor-status">Abrindo a câmera…</div>
+  <div class="leitor-botoes">
+    <button id="leitor-btn-luz" style="display:none" onclick="alternarLanternaLeitor()">🔦 Luz</button>
+    <button id="leitor-btn-foto" onclick="escolherFotoLeitor()">🖼️ Usar foto</button>
+    <button id="leitor-btn-pular" onclick="pularLeituraNome()">⏭️ Sem o nome</button>
+    <button id="leitor-btn-fechar" onclick="fecharLeitorEtiqueta()">✕ Fechar</button>
+  </div>
+  <input type="file" id="leitor-arquivo" accept="image/*" style="display:none" onchange="lerEtiquetaDeArquivo(event)" />
+</div>
+
 <div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
   <div class="modal" id="modal-conteudo">
     <div class="modal-handle"></div>
@@ -4372,6 +4426,7 @@ function registrarMovimentacao({ pisoId, pisoNome, lote, bitola, tonalidade, ori
 const CHAVE_CONF = 'estoque_conferencia_v1';
 let confTipoAtual = 'piso';
 let confFotoAtual = null;
+let confEtiquetaAtual = null; // dados da etiqueta lida pela câmera (GTIN, SSCC) — vão junto com o item ao salvar
 let filtroConfUsuario = 'todos'; // filtro ativo de usuário na conferência
 let filtroConfTipo = 'todos'; // filtro ativo de tipo de material na conferência
 let filtroConfSistema = 'todos'; // filtro por status "Finalizado" (noSistema) / "Em aberto"
@@ -4467,7 +4522,11 @@ function renderFormConferencia() {
     ? '💔 ' + tituloBase.replace(/^\S+\s*/, '').replace('Cadastrar', 'Registrar Quebra de')
     : tituloBase;
 
-  let html = '';
+  confEtiquetaAtual = null; // formulário novo: esquece a etiqueta lida antes
+  let html = confTipoAtual === 'piso'
+    ? `<button type="button" class="btn-ler-etiqueta" id="btn-ler-etiqueta" onclick="abrirLeitorEtiqueta()">📷 Ler etiqueta do pallet</button>
+       <div id="conf-etiqueta-info" style="display:none"></div>`
+    : '';
   let i = 0;
   while (i < campos.length) {
     const c = campos[i];
@@ -4686,6 +4745,12 @@ function montarItemConfDoForm() {
     item.totalPecas = (v('pallets') * v('pecasPorPallet')) + v('pecasAvulsas');
   }
 
+  // Lido pela câmera: guarda os códigos da etiqueta (servem para reconhecer o piso nas próximas leituras)
+  if (confEtiquetaAtual && confTipoAtual === 'piso') {
+    if (confEtiquetaAtual.gtin) item.gtin = confEtiquetaAtual.gtin;
+    if (confEtiquetaAtual.sscc) item.sscc = confEtiquetaAtual.sscc;
+  }
+
   item.criadoEm = new Date().toLocaleString('pt-BR');
   return item;
 }
@@ -4694,6 +4759,7 @@ function salvarItemConferencia() {
   if (!exigirEdicao('conferencia')) return;
   const item = montarItemConfDoForm();
   if (!item) return;
+  lembrarProdutoGtin(item);
 
   const lista = carregarConferencia();
   lista.unshift(item);
@@ -4723,6 +4789,7 @@ function salvarItemQuebra() {
   if (!exigirEdicao('quebras')) return;
   const item = montarItemConfDoForm();
   if (!item) return;
+  lembrarProdutoGtin(item);
 
   item.avaria = true;
   item.statusQuebra = 'pendente'; // pendente → retirado
@@ -4735,6 +4802,571 @@ function salvarItemQuebra() {
   toast('💔 Quebra registrada!');
 }
 function salvarItemComoAvaria() { salvarItemQuebra(); }
+
+// ===================== LEITOR DE ETIQUETA DO PALLET =====================
+// Lê o código quadrado (DataMatrix GS1) da etiqueta e preenche o piso na Conferência / Quebras.
+// O código traz: GTIN (02), lote (10), tonalidade (240), bitola (90), caixas (37), m² por caixa (314n) e SSCC (00).
+// Nome e formato NÃO vêm no código: saem do que o app já conhece daquele GTIN ou são lidos da foto (OCR).
+// O operador completa só endereço, pallets, caixas avulsas e peças.
+const LEITOR_LIBS = {
+  zxing: 'https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.6/dist/iife/reader/index.js',
+  zxingWasm: 'https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.6/dist/reader/zxing_reader.wasm',
+  tesseract: 'https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js'
+};
+const CHAVE_CATALOGO_GTIN = 'estoque_catalogo_gtin_v1';
+const LEITOR_FORMATOS = ['DataMatrix', 'Code128', 'QRCode', 'EAN13', 'ITF14'];
+const LEITOR_CAMPOS_PRODUTO = ['nome', 'marca', 'codigo', 'tamanho', 'lote', 'bitola', 'tonalidade', 'caixasPorPallet', 'm2PorCaixa'];
+const _leitor = { aberto: false, rodando: false, sessao: 0, timer: null, stream: null, luz: false, parcial: {}, motor: null, motorPronto: null, pularOCR: null, ocrProgresso: null, audio: null, quadroLeve: null };
+
+const _scriptsExternos = {};
+function carregarScriptExterno(url) {
+  if (!_scriptsExternos[url]) {
+    _scriptsExternos[url] = new Promise((ok, falha) => {
+      const s = document.createElement('script');
+      s.src = url; s.async = true; s.crossOrigin = 'anonymous'; // CORS: deixa o app guardar a biblioteca para usar sem internet
+      s.onload = () => ok();
+      s.onerror = () => { delete _scriptsExternos[url]; s.remove(); falha(new Error('sem internet para baixar ' + url.split('/npm/')[1])); };
+      document.head.appendChild(s);
+    });
+  }
+  return _scriptsExternos[url];
+}
+
+// ---------- Leitura dos códigos ----------
+let _zxingPronto = null;
+function prepararZXing() {
+  if (!_zxingPronto) {
+    _zxingPronto = carregarScriptExterno(LEITOR_LIBS.zxing)
+      .then(() => window.ZXingWASM.prepareZXingModule({
+        overrides: { locateFile: (arq, prefixo) => arq.endsWith('.wasm') ? LEITOR_LIBS.zxingWasm : prefixo + arq },
+        fireImmediately: true
+      }))
+      .then(() => window.ZXingWASM)
+      .catch(e => { _zxingPronto = null; throw e; });
+  }
+  return _zxingPronto;
+}
+// Leitor de códigos: o ZXing (baixado na 1ª vez) ou, sem internet, o leitor do próprio celular (Android)
+async function prepararMotorLeitor() {
+  try { return { tipo: 'zxing', Z: await prepararZXing() }; }
+  catch (e) {
+    if ('BarcodeDetector' in window) {
+      try {
+        const sup = await window.BarcodeDetector.getSupportedFormats();
+        const fmts = ['data_matrix', 'code_128', 'qr_code', 'ean_13', 'itf'].filter(f => sup.includes(f));
+        if (fmts.includes('data_matrix')) return { tipo: 'nativo', det: new window.BarcodeDetector({ formats: fmts }) };
+      } catch (x) {}
+    }
+    throw e;
+  }
+}
+function obterMotorLeitor() {
+  if (!_leitor.motor) {
+    _leitor.motor = prepararMotorLeitor();
+    _leitor.motor.catch(() => { _leitor.motor = null; });
+  }
+  return _leitor.motor;
+}
+async function detectarCodigos(motor, canvas) {
+  if (motor.tipo === 'zxing') {
+    const img = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height);
+    const r = await motor.Z.readBarcodes(img, { formats: LEITOR_FORMATOS, tryHarder: true, maxNumberOfSymbols: 6 });
+    return r.filter(x => x.isValid && x.text).map(x => x.text);
+  }
+  const r = await motor.det.detect(canvas);
+  return r.map(x => x.rawValue).filter(Boolean);
+}
+function canvasReduzido(fonte, max, reaproveitar) {
+  const w0 = fonte.videoWidth || fonte.naturalWidth || fonte.width, h0 = fonte.videoHeight || fonte.naturalHeight || fonte.height;
+  const e = Math.min(1, max / Math.max(w0, h0));
+  const c = reaproveitar || document.createElement('canvas');
+  const w = Math.max(1, Math.round(w0 * e)), h = Math.max(1, Math.round(h0 * e));
+  if (c.width !== w) c.width = w;
+  if (c.height !== h) c.height = h;
+  c.getContext('2d', { willReadFrequently: true }).drawImage(fonte, 0, 0, w, h);
+  return c;
+}
+
+// ---------- Padrão GS1 (o mesmo das etiquetas de pallet das fábricas) ----------
+function digitoGS1Ok(n) {
+  if (!/^\d{8,18}$/.test(n)) return false;
+  const d = n.split('').map(Number), dv = d.pop();
+  let soma = 0;
+  d.reverse().forEach((x, k) => { soma += x * (k % 2 === 0 ? 3 : 1); });
+  return (10 - soma % 10) % 10 === dv;
+}
+// Qual campo (AI) começa na posição i e quantos caracteres ele tem (f = fixo, v = variável até N)
+function gs1Campo(s, i) {
+  const a2 = s.substr(i, 2), a3 = s.substr(i, 3), a4 = s.substr(i, 4);
+  if (/^3[1-6]\d\d$/.test(a4)) return { ai: a4, f: 6 };      // medidas: peso, área… (último dígito = casas decimais)
+  if (/^39\d\d$/.test(a4)) return { ai: a4, v: 18 };
+  if (/^[78]\d{3}$/.test(a4)) return { ai: a4, v: 30 };
+  if (/^41\d$/.test(a3)) return { ai: a3, f: 13 };
+  if (a3 === '402') return { ai: a3, f: 17 };
+  if (/^42[246]$/.test(a3)) return { ai: a3, f: 3 };
+  if (/^(2[3-5]\d|4[0-2]\d)$/.test(a3)) return { ai: a3, v: 30 };
+  const fixos = { '00': 18, '01': 14, '02': 14, '03': 14, '11': 6, '12': 6, '13': 6, '15': 6, '16': 6, '17': 6, '20': 2 };
+  if (fixos[a2]) return { ai: a2, f: fixos[a2] };
+  if (/^\d\d$/.test(a2)) return { ai: a2, v: a2 >= '90' ? 90 : 30 };
+  return null;
+}
+function lerGS1(texto) {
+  const out = {};
+  let s = String(texto || '').trim();
+  if (/^\(\d{2,4}\)/.test(s)) { // forma legível: (02)07896880031394(10)J15…
+    const re = /\((\d{2,4})\)([^(]*)/g; let m;
+    while ((m = re.exec(s))) out[m[1]] = m[2].trim();
+    return out;
+  }
+  // forma "crua": campos de tamanho variável terminam no separador GS (caractere 29)
+  s = s.replace(/^\][A-Za-z]\d/, '');
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] === '\x1d') { i++; continue; }
+    const c = gs1Campo(s, i);
+    if (!c) break;
+    i += c.ai.length;
+    let fim;
+    if (c.f) fim = i + c.f;
+    else { const gs = s.indexOf('\x1d', i); fim = gs < 0 ? Math.min(s.length, i + c.v) : Math.min(gs, i + c.v); }
+    out[c.ai] = s.slice(i, fim);
+    i = fim;
+  }
+  return out;
+}
+// Junta tudo o que foi lido (código 2D, código de barras do pallet, EAN da caixa)
+function interpretarCodigos(textos) {
+  const d = {};
+  (textos || []).forEach(t => {
+    const s = String(t || '').trim();
+    if (/^\d{13}$/.test(s)) { if (digitoGS1Ok(s) && !d.gtin) d.gtin = s; return; }                       // EAN-13 da caixa
+    if (/^\d{14}$/.test(s)) { if (digitoGS1Ok(s) && !d.gtin) d.gtin = s[0] === '0' ? s.slice(1) : s; return; } // ITF-14
+    const ehGS1 = /^\(\d{2,4}\)/.test(s) || s.includes('\x1d') || /^\][dCQe]\d/.test(s) || /^0[0-2]\d{16}/.test(s);
+    if (!ehGS1) return; // ex.: código interno da fábrica ("006300048")
+    const c = lerGS1(s);
+    const g = c['02'] || c['01'];
+    if (g && /^\d{14}$/.test(g) && digitoGS1Ok(g)) d.gtin = g[0] === '0' ? g.slice(1) : g;
+    if (c['00'] && /^\d{18}$/.test(c['00']) && digitoGS1Ok(c['00'])) d.sscc = c['00'];
+    if (c['10']) d.lote = c['10'];
+    if (c['240']) d.tonalidade = c['240'];
+    if (c['90']) d.bitola = c['90'];
+    if (c['37'] && /^\d+$/.test(c['37'])) d.caixasPorPallet = String(parseInt(c['37'], 10));
+    for (let n = 0; n <= 5; n++) {
+      const v = c['314' + n];
+      if (v && /^\d{6}$/.test(v)) { d.m2PorCaixa = String(+(parseInt(v, 10) / Math.pow(10, n)).toFixed(4)); break; }
+    }
+  });
+  return d;
+}
+
+// ---------- O que o app já sabe de cada GTIN (aprende a cada piso salvo) ----------
+function normTexto(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+function normTamanho(s) { const m = String(s || '').replace(/,/g, '.').match(/(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+(?:\.\d+)?)/); return m ? `${+m[1]}x${+m[2]}` : ''; }
+function carregarCatalogoGtin() { try { return JSON.parse(localStorage.getItem(CHAVE_CATALOGO_GTIN)) || {}; } catch (e) { return {}; } }
+function lembrarProdutoGtin(item) {
+  try {
+    if (!item || !item.gtin || !String(item.nome || '').trim()) return;
+    const cat = carregarCatalogoGtin();
+    cat[item.gtin] = { nome: item.nome, marca: item.marca || '', codigo: item.codigo || '', tamanho: item.tamanho || '', em: agoraSync() };
+    const ks = Object.keys(cat);
+    if (ks.length > 800) ks.sort((a, b) => (cat[a].em || 0) - (cat[b].em || 0)).slice(0, ks.length - 800).forEach(k => delete cat[k]);
+    gravarLS(CHAVE_CATALOGO_GTIN, JSON.stringify(cat));
+  } catch (e) { registrarErro('catálogo GTIN', e); }
+}
+// Procura o GTIN nos pisos já lançados (vêm de todos os aparelhos) e no que este aparelho já salvou
+function produtoPorGtin(gtin) {
+  if (!gtin) return null;
+  const fontes = [];
+  [...carregarConferencia(), ...carregarQuebras()].forEach(i => {
+    if (i && i.gtin === gtin && String(i.nome || '').trim()) fontes.push({ ...i, _t: tsItem(i) });
+  });
+  const cat = carregarCatalogoGtin()[gtin];
+  if (cat && cat.nome) fontes.push({ ...cat, _t: cat.em || 0 });
+  if (!fontes.length) return null;
+  fontes.sort((a, b) => b._t - a._t);
+  const r = {};
+  ['nome', 'marca', 'codigo', 'tamanho'].forEach(k => { const f = fontes.find(x => String(x[k] || '').trim()); r[k] = f ? String(f[k]).trim() : ''; });
+  return r;
+}
+// Mesma fábrica = mesmo começo do GTIN → mesma marca
+function marcaPorPrefixo(gtin) {
+  if (!gtin || gtin.length < 12) return '';
+  const p = gtin.slice(0, 8);
+  const daLista = [...carregarConferencia(), ...carregarQuebras()].find(i => i && i.gtin && i.gtin !== gtin && i.gtin.slice(0, 8) === p && i.marca);
+  if (daLista) return daLista.marca;
+  const cat = carregarCatalogoGtin();
+  const k = Object.keys(cat).find(g => g !== gtin && g.slice(0, 8) === p && cat[g].marca);
+  return k ? cat[k].marca : '';
+}
+// Piso lido pela foto: procura um lançamento antigo com o mesmo nome (usa o nome, a marca e o código de lá)
+function produtoPorNome(nome, tamanho) {
+  const n = normTexto(nome);
+  if (n.length < 5) return null;
+  const tam = normTamanho(tamanho);
+  let melhor = null;
+  [...carregarConferencia(), ...carregarQuebras(), ...carregar()].forEach(i => {
+    if (!i || (i.tipo && i.tipo !== 'piso')) return;
+    const nn = normTexto(i.nome);
+    if (!nn) return;
+    let nota = nn === n ? 3 : nn.startsWith(n + ' ') ? 2 : n.startsWith(nn + ' ') ? 1 : 0;
+    if (!nota) return;
+    const ti = normTamanho(i.tamanho);
+    if (tam && ti && ti !== tam) return; // tamanho diferente = outro produto
+    if (tam && ti === tam) nota += 3;
+    const t = tsItem(i);
+    if (!melhor || nota > melhor.nota || (nota === melhor.nota && t > melhor.t)) melhor = { nota, t, nome: i.nome, marca: i.marca || '', codigo: i.codigo || '', tamanho: i.tamanho || '' };
+  });
+  return melhor;
+}
+
+// ---------- Leitura do nome pela foto (OCR) ----------
+let _ocrPronto = null;
+function prepararOCR() {
+  if (!_ocrPronto) {
+    _ocrPronto = carregarScriptExterno(LEITOR_LIBS.tesseract)
+      .then(() => window.Tesseract.createWorker('por', 1, { logger: m => { try { if (_leitor.ocrProgresso) _leitor.ocrProgresso(m); } catch (e) {} } }))
+      .then(async w => { await w.setParameters({ tessedit_pageseg_mode: '11' }); return w; }) // 11 = texto espalhado (etiqueta em tabela)
+      .catch(e => { _ocrPronto = null; throw e; });
+  }
+  return _ocrPronto;
+}
+const ROTULOS_ETIQUETA = /\b(PEI|LOCAL|USO|FORMATO|EMPILH\w*|AREA|CAIXAS?|PESO|FORNO|TURMA|BITOLA|TON|TONALIDADE|LIBERADO|SSCC|GTIN|EAN|QUALIDADE|LOTE|MAX|KG|TOTAL|DATA|VALIDADE|FABRICA\w*|REF|COD|CODIGO)\b/;
+function capitalizarNome(s) { return String(s).toLowerCase().replace(/(^|[\s\-\/])([a-zà-ÿ])/g, (m, a, b) => a + b.toUpperCase()); }
+function interpretarTextoEtiqueta(linhas) {
+  const r = {};
+  const tudo = linhas.map(l => l.texto).join('\n');
+  const lf = linhas.find(l => /formato/i.test(l.texto) && /\d{2,3}\s*[xX×]\s*\d{2,3}/.test(l.texto));
+  const mt = (lf ? lf.texto : tudo).match(/(\d{2,3})\s*[xX×]\s*(\d{2,3})/);
+  if (mt) r.tamanho = `${+mt[1]}x${+mt[2]}`;
+  const mg = tudo.match(/GTIN\D{0,4}(\d{13,14})/i);
+  if (mg && digitoGS1Ok(mg[1])) r.gtin = mg[1].length === 14 && mg[1][0] === '0' ? mg[1].slice(1) : mg[1];
+  const ms = tudo.match(/SSCC\D{0,4}(\d{18})/i);
+  if (ms && digitoGS1Ok(ms[1])) r.sscc = ms[1];
+  // Nome: a linha de palavras com as letras MAIORES da etiqueta (que não seja um rótulo como "Formato", "Lote"…)
+  let melhor = null;
+  // (avalia palavra por palavra: risco de caneta ou fita em cima da etiqueta não derruba a linha toda)
+  linhas.forEach(l => {
+    if (ROTULOS_ETIQUETA.test(normTexto(l.texto).toUpperCase())) return;
+    const base = l.palavras && l.palavras.length ? l.palavras : l.texto.split(/\s+/).map(t => ({ t, h: 0 }));
+    const pals = base
+      .map(p => ({ t: String(p.t || '').replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''), h: p.h || 0, c: typeof p.c === 'number' ? p.c : (l.conf || 0) }))
+      .filter(p => p.t.length >= 2 && /[A-Za-zÀ-ÿ]{2}/.test(p.t) && !/[^A-Za-zÀ-ÿ0-9\-.\/]/.test(p.t) && p.c >= 15);
+    if (pals.length < 2) return;
+    const conf = pals.reduce((soma, p) => soma + p.c, 0) / pals.length;
+    if (conf < 50) return;
+    const letras = pals.map(p => p.t).join('').replace(/[^A-Za-zÀ-ÿ]/g, '').length;
+    if (letras < 6) return;
+    const alturas = pals.map(p => p.h).filter(Boolean).sort((x, y) => x - y);
+    const h = alturas.length ? alturas[Math.floor(alturas.length / 2)] : 0;
+    const nota = h * 10 + letras + conf / 10;
+    if (!melhor || nota > melhor.nota) melhor = { nota, texto: pals.map(p => p.t).join(' ') };
+  });
+  if (melhor) r.nome = capitalizarNome(melhor.texto);
+  return r;
+}
+async function lerTextoEtiqueta(fonte) {
+  const w = await prepararOCR();
+  const c = canvasReduzido(fonte, 1600);
+  const { data } = await w.recognize(c, {}, { text: true, blocks: true });
+  const linhas = [];
+  (data.blocks || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => {
+    linhas.push({ texto: String(l.text || '').trim(), conf: l.confidence, palavras: (l.words || []).map(x => ({ t: x.text, h: x.bbox.y1 - x.bbox.y0, c: x.confidence })) });
+  })));
+  if (!linhas.length && data.text) data.text.split('\n').forEach(t => linhas.push({ texto: t.trim(), conf: 70, palavras: [] }));
+  return interpretarTextoEtiqueta(linhas);
+}
+
+// ---------- Tela da câmera ----------
+function leitorStatus(msg, progresso) {
+  const el = document.getElementById('leitor-status');
+  if (!el) return;
+  el.textContent = msg;
+  if (typeof progresso === 'number') {
+    const b = document.createElement('div'); b.className = 'leitor-barra';
+    const p = document.createElement('div'); p.style.width = Math.round(Math.max(0, Math.min(1, progresso)) * 100) + '%';
+    b.appendChild(p); el.appendChild(b);
+  }
+}
+function leitorProgressoOCR(m) {
+  const fases = { 'loading tesseract core': 'Baixando o leitor de texto (só na 1ª vez)…', 'loading language traineddata': 'Baixando o leitor de texto (só na 1ª vez)…', 'initializing api': 'Preparando o leitor de texto…', 'recognizing text': 'Lendo o nome do piso na etiqueta…' };
+  const f = fases[m && m.status];
+  if (f) leitorStatus('📖 ' + f, typeof m.progress === 'number' ? m.progress : undefined);
+}
+function bipLeitor() {
+  try { if (navigator.vibrate) navigator.vibrate(80); } catch (e) {}
+  try {
+    const ctx = _leitor.audio;
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'square'; o.frequency.value = 1760; g.gain.value = 0.05;
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.09);
+  } catch (e) {}
+}
+function pararCameraLeitor() {
+  _leitor.rodando = false;
+  clearTimeout(_leitor.timer);
+  if (_leitor.stream) { _leitor.stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }); _leitor.stream = null; }
+  const v = document.getElementById('leitor-video');
+  if (v) { try { v.pause(); } catch (e) {} v.srcObject = null; }
+  _leitor.luz = false;
+  const bl = document.getElementById('leitor-btn-luz');
+  if (bl) { bl.style.display = 'none'; bl.classList.remove('luz-ligada'); }
+}
+function fecharLeitorEtiqueta() {
+  _leitor.sessao++;
+  _leitor.aberto = false;
+  _leitor.retomar = false;
+  pararCameraLeitor();
+  if (_leitor.pularOCR) { const f = _leitor.pularOCR; _leitor.pularOCR = null; f(); }
+  _leitor.ocrProgresso = null;
+  document.getElementById('leitor-etiqueta').classList.remove('aberto', 'congelado');
+}
+function pularLeituraNome() { if (_leitor.pularOCR) { const f = _leitor.pularOCR; _leitor.pularOCR = null; f(); } }
+async function alternarLanternaLeitor() {
+  const t = _leitor.stream && _leitor.stream.getVideoTracks()[0];
+  if (!t) return;
+  const novo = !_leitor.luz;
+  try {
+    await t.applyConstraints({ advanced: [{ torch: novo }] });
+    _leitor.luz = novo;
+    document.getElementById('leitor-btn-luz').classList.toggle('luz-ligada', novo);
+  } catch (e) { leitorStatus('A lanterna não liga neste aparelho.'); }
+}
+
+async function abrirLeitorEtiqueta() {
+  if (!exigirEdicao(confFormModo === 'quebras' ? 'quebras' : 'conferencia')) return;
+  const tela = document.getElementById('leitor-etiqueta');
+  const sessao = ++_leitor.sessao;
+  pararCameraLeitor();
+  Object.assign(_leitor, { aberto: true, parcial: {}, pularOCR: null, ocrProgresso: null });
+  tela.classList.remove('congelado');
+  tela.classList.add('aberto');
+  document.getElementById('leitor-btn-pular').style.display = 'none';
+  document.getElementById('leitor-btn-foto').style.display = '';
+  try { const AC = window.AudioContext || window.webkitAudioContext; if (AC && !_leitor.audio) _leitor.audio = new AC(); if (_leitor.audio) _leitor.audio.resume(); } catch (e) {}
+  leitorStatus('📷 Abrindo a câmera…');
+  const motor = obterMotorLeitor(); // já vai baixando o leitor enquanto a câmera abre
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    leitorStatus('A câmera não abre aqui. Toque em “🖼️ Usar foto” e fotografe a etiqueta.');
+    return;
+  }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+  } catch (e) {
+    if (sessao !== _leitor.sessao) return;
+    registrarErro('leitor: câmera', e);
+    leitorStatus(e && e.name === 'NotAllowedError'
+      ? '🚫 O app está sem permissão para a câmera. Libere a câmera para este site nas configurações do navegador, ou toque em “🖼️ Usar foto”.'
+      : '⚠️ Não consegui abrir a câmera. Toque em “🖼️ Usar foto” e fotografe a etiqueta.');
+    return;
+  }
+  if (sessao !== _leitor.sessao) { stream.getTracks().forEach(t => t.stop()); return; }
+  _leitor.stream = stream;
+  const video = document.getElementById('leitor-video');
+  video.srcObject = stream;
+  try { await video.play(); } catch (e) {}
+  try {
+    const track = stream.getVideoTracks()[0];
+    const cap = track.getCapabilities ? track.getCapabilities() : {};
+    if (cap.torch) document.getElementById('leitor-btn-luz').style.display = '';
+    if (Array.isArray(cap.focusMode) && cap.focusMode.includes('continuous')) track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
+  } catch (e) {}
+  leitorStatus('⏳ Preparando o leitor…');
+  _leitor.semInternet = false;
+  try { _leitor.motorPronto = await motor; }
+  catch (e) {
+    if (sessao !== _leitor.sessao) return;
+    registrarErro('leitor: carregar', e);
+    leitorStatus('📶 Sem internet para baixar o leitor (só precisa na 1ª vez). Conecte e abra de novo.');
+    return;
+  }
+  if (sessao !== _leitor.sessao) return;
+  leitorStatus('🔍 Aponte para o código quadrado (2D) da etiqueta');
+  _leitor.rodando = true;
+  cicloLeitor(sessao);
+}
+async function cicloLeitor(sessao) {
+  if (sessao !== _leitor.sessao || !_leitor.rodando) return;
+  const video = document.getElementById('leitor-video');
+  try {
+    if (video.readyState >= 2 && video.videoWidth) {
+      _leitor.quadroLeve = canvasReduzido(video, 1280, _leitor.quadroLeve);
+      const textos = await detectarCodigos(_leitor.motorPronto, _leitor.quadroLeve);
+      if (sessao !== _leitor.sessao || !_leitor.rodando) return;
+      if (textos.length) {
+        Object.assign(_leitor.parcial, interpretarCodigos(textos));
+        if (_leitor.parcial.gtin) { _leitor.rodando = false; await concluirLeituraVideo(sessao, video); return; }
+        if (_leitor.parcial.sscc) leitorStatus('👍 Li o código de barras do pallet. Agora aponte para o código quadrado (2D).');
+      }
+    }
+  } catch (e) { registrarErro('leitor: quadro', e); }
+  if (sessao === _leitor.sessao && _leitor.rodando) _leitor.timer = setTimeout(() => cicloLeitor(sessao), 150);
+}
+async function concluirLeituraVideo(sessao, video) {
+  // congela a imagem em resolução cheia: é dela que sai o nome, se precisar
+  const quadro = document.getElementById('leitor-quadro');
+  quadro.width = video.videoWidth; quadro.height = video.videoHeight;
+  quadro.getContext('2d').drawImage(video, 0, 0, quadro.width, quadro.height);
+  document.getElementById('leitor-etiqueta').classList.add('congelado');
+  pararCameraLeitor();
+  bipLeitor();
+  await finalizarEtiqueta(sessao, quadro);
+}
+function abrirImagemArquivo(arq) {
+  return new Promise((ok, falha) => {
+    const url = URL.createObjectURL(arq), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(url); ok(im); };
+    im.onerror = () => { URL.revokeObjectURL(url); falha(new Error('imagem inválida')); };
+    im.src = url;
+  });
+}
+async function lerEtiquetaDeArquivo(ev) {
+  const arq = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!arq) return;
+  const sessao = ++_leitor.sessao;
+  pararCameraLeitor();
+  _leitor.parcial = {};
+  leitorStatus('⏳ Abrindo a foto…');
+  let img;
+  try { img = await abrirImagemArquivo(arq); }
+  catch (e) { if (sessao === _leitor.sessao) leitorStatus('⚠️ Não consegui abrir essa foto. Tente outra.'); return; }
+  if (sessao !== _leitor.sessao) return;
+  const grande = canvasReduzido(img, 3000);
+  const quadro = document.getElementById('leitor-quadro');
+  quadro.width = grande.width; quadro.height = grande.height;
+  quadro.getContext('2d').drawImage(grande, 0, 0);
+  document.getElementById('leitor-etiqueta').classList.add('congelado');
+  leitorStatus('🔍 Procurando o código da etiqueta…');
+  let motor = null;
+  _leitor.semInternet = false;
+  try { motor = await obterMotorLeitor(); } catch (e) { registrarErro('leitor: carregar', e); _leitor.semInternet = true; }
+  if (sessao !== _leitor.sessao) return;
+  if (motor) {
+    try {
+      let textos = await detectarCodigos(motor, canvasReduzido(grande, 1600));
+      if (!textos.length && Math.max(grande.width, grande.height) > 1600) textos = await detectarCodigos(motor, grande);
+      Object.assign(_leitor.parcial, interpretarCodigos(textos));
+    } catch (e) { registrarErro('leitor: foto', e); }
+  }
+  if (sessao !== _leitor.sessao) return;
+  if (_leitor.parcial.gtin) bipLeitor();
+  await finalizarEtiqueta(sessao, grande);
+}
+async function finalizarEtiqueta(sessao, foto) {
+  const dados = { ..._leitor.parcial };
+  let prod = produtoPorGtin(dados.gtin);
+  let ocr = null;
+  if (!prod || !prod.nome || !prod.tamanho) {
+    // piso ainda desconhecido: lê o nome e o formato na foto
+    document.getElementById('leitor-btn-pular').style.display = 'block';
+    document.getElementById('leitor-btn-foto').style.display = 'none';
+    leitorStatus(dados.gtin ? '📖 Piso novo: lendo o nome na etiqueta…' : '📖 Não achei o código 2D. Lendo o texto da etiqueta…');
+    _leitor.ocrProgresso = m => { if (sessao === _leitor.sessao) leitorProgressoOCR(m); };
+    try {
+      ocr = await Promise.race([lerTextoEtiqueta(foto), new Promise(res => { _leitor.pularOCR = () => res(null); })]);
+    } catch (e) { registrarErro('leitor: ler nome', e); ocr = null; if (/sem internet/.test(e && e.message)) _leitor.semInternet = true; }
+    _leitor.pularOCR = null; _leitor.ocrProgresso = null;
+    if (sessao !== _leitor.sessao) return;
+    if (ocr) {
+      if (!dados.gtin && ocr.gtin) { dados.gtin = ocr.gtin; prod = produtoPorGtin(ocr.gtin); }
+      if (!dados.sscc && ocr.sscc) dados.sscc = ocr.sscc;
+    }
+  }
+  if (sessao !== _leitor.sessao) return;
+  const porNome = (!prod || !prod.nome) && ocr && ocr.nome ? produtoPorNome(ocr.nome, (prod && prod.tamanho) || ocr.tamanho) : null;
+  const v = {
+    nome: (prod && prod.nome) || (porNome && porNome.nome) || (ocr && ocr.nome) || '',
+    marca: (prod && prod.marca) || (porNome && porNome.marca) || marcaPorPrefixo(dados.gtin),
+    codigo: (prod && prod.codigo) || (porNome && porNome.codigo) || '',
+    tamanho: (prod && prod.tamanho) || (porNome && porNome.tamanho) || (ocr && ocr.tamanho) || '',
+    lote: dados.lote || '', tonalidade: dados.tonalidade || '', bitola: dados.bitola || '',
+    caixasPorPallet: dados.caixasPorPallet || '', m2PorCaixa: dados.m2PorCaixa || ''
+  };
+  const origem = prod && prod.nome ? 'conhecido' : porNome ? 'nome' : (ocr && ocr.nome) ? 'foto' : 'nenhum';
+  fecharLeitorEtiqueta();
+  preencherFormComEtiqueta(v, dados, origem);
+}
+
+// ---------- Preenche o formulário ----------
+function escEtiqueta(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function preencherFormComEtiqueta(v, dados, origem) {
+  if (!dados.gtin && !v.nome && !v.lote) {
+    toast(_leitor.semInternet ? '📶 Sem internet para baixar o leitor (só na 1ª vez). Conecte e tente de novo.' : '⚠️ Não consegui ler a etiqueta. Tente de novo mais perto e com luz.', true);
+    return;
+  }
+  if (confTipoAtual !== 'piso') {
+    const btn = [...document.querySelectorAll('.conf-tipo-btn')].find(b => (b.getAttribute('onclick') || '').includes("'piso'"));
+    selecionarTipoConf('piso', btn);
+  }
+  LEITOR_CAMPOS_PRODUTO.forEach(k => { // campos do produto: troca tudo (endereço e quantidades ficam como estão)
+    const el = document.getElementById('conf_' + k);
+    if (!el) return;
+    el.classList.remove('campo-lido', 'campo-faltou');
+    el.value = v[k] || '';
+    if (v[k]) el.classList.add('campo-lido');
+    else if (k === 'nome' || k === 'marca' || k === 'codigo') el.classList.add('campo-faltou');
+  });
+  confEtiquetaAtual = { gtin: dados.gtin || '', sscc: dados.sscc || '' };
+  calcularTotalConf();
+  renderInfoEtiqueta(v, dados, origem);
+  const alvo = document.getElementById(v.nome ? 'conf_endereco' : 'conf_nome');
+  if (alvo) {
+    try { alvo.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    setTimeout(() => { try { alvo.focus({ preventScroll: true }); } catch (e) {} }, 350);
+  }
+  toast('🏷️ Etiqueta lida! Complete o local e as quantidades.');
+}
+function renderInfoEtiqueta(v, dados, origem) {
+  const box = document.getElementById('conf-etiqueta-info');
+  if (!box) return;
+  const e = escEtiqueta, avisos = [];
+  if (origem === 'foto') avisos.push(['', '📖 Nome e formato lidos pela foto: confira se estão certos.']);
+  if (origem === 'nome') avisos.push(['', '🔎 Piso reconhecido pelo nome em lançamentos anteriores: confira.']);
+  if (!v.nome) avisos.push(['', '✍️ Não consegui ler o nome: digite o nome do piso.']);
+  const falta = [!v.marca && 'a marca', !v.codigo && 'o código'].filter(Boolean);
+  if (falta.length) avisos.push(['', `✍️ Preencha ${falta.join(' e ')}. Depois de salvo, este piso vem completo nas próximas leituras.`]);
+  if (dados.sscc && confFormModo !== 'quebras') {
+    const rep = carregarConferencia().find(i => i && i.sscc === dados.sscc);
+    if (rep) avisos.push(['perigo', `⚠️ Este pallet (mesmo SSCC) já foi lançado: ${e(rep.nome)}${rep.endereco ? ' em ' + e(rep.endereco) : ''}${rep.responsavel ? ' por ' + e(rep.responsavel) : ''}.`]);
+  }
+  const m2 = v.m2PorCaixa ? String(v.m2PorCaixa).replace('.', ',') + ' m²/cx' : '— m²/cx';
+  box.innerHTML = `<button type="button" class="eti-fechar" onclick="ocultarInfoEtiqueta()" aria-label="Fechar aviso">✕</button>
+    <div class="eti-titulo">🏷️ Etiqueta lida${v.nome ? ': ' + e(v.nome) : ''}</div>
+    <div>Lote <b>${e(v.lote || '—')}</b> · Ton <b>${e(v.tonalidade || '—')}</b> · Bitola <b>${e(v.bitola || '—')}</b> · <b>${e(v.caixasPorPallet || '—')}</b> cx/pallet · ${e(m2)}</div>
+    <div class="eti-codigos">${dados.gtin ? 'GTIN ' + e(dados.gtin) : 'sem GTIN'}${dados.sscc ? ' · SSCC ' + e(dados.sscc) : ''}</div>
+    ${avisos.map(([c, t]) => `<div class="eti-aviso ${c}">${t}</div>`).join('')}
+    <div style="margin-top:6px;font-weight:700">👉 Agora informe o endereço, os pallets, as caixas avulsas e as peças.</div>`;
+  box.style.display = '';
+}
+function ocultarInfoEtiqueta() {
+  const box = document.getElementById('conf-etiqueta-info');
+  if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+// Ao corrigir um campo preenchido pela leitura, tira o destaque dele
+document.getElementById('conf-form-campos')?.addEventListener('input', ev => {
+  if (ev.target && ev.target.classList) ev.target.classList.remove('campo-lido', 'campo-faltou');
+});
+// "Usar foto": desliga a câmera ao vivo e abre a câmera/galeria do celular
+function escolherFotoLeitor() {
+  _leitor.sessao++;
+  pararCameraLeitor();
+  _leitor.retomar = false;
+  leitorStatus('🖼️ Tire ou escolha a foto da etiqueta…');
+  document.getElementById('leitor-arquivo').click();
+}
+document.getElementById('leitor-arquivo')?.addEventListener('cancel', () => { if (_leitor.aberto) abrirLeitorEtiqueta(); });
+// App foi para o fundo: solta a câmera; ao voltar, liga de novo
+document.addEventListener('visibilitychange', () => {
+  if (!_leitor.aberto) return;
+  if (document.hidden) { if (_leitor.stream) { pararCameraLeitor(); _leitor.retomar = true; } }
+  else if (_leitor.retomar) {
+    _leitor.retomar = false;
+    if (!document.getElementById('leitor-etiqueta').classList.contains('congelado')) abrirLeitorEtiqueta();
+  }
+});
 
 
 // ===================== ADD QUEBRA A PARTIR DA CONFERÊNCIA =====================
@@ -6843,7 +7475,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('mapa-viewport')?.classList.contains('tela-cheia') && !document.getElementById('mapa-folha')) alternarTelaCheiaMapa();
 });
 
-const VERSAO_APP = '2026.11.08c';
+const VERSAO_APP = '2026.11.24a';
 // ----- Aviso de versão nova (aba aberta há muito tempo no PC continuaria com a versão antiga) -----
 let _ultimaChecagemVersao = 0;
 async function checarNovaVersao() {
