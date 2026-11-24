@@ -2,8 +2,9 @@
 // - Página e arquivos do app: busca sempre a versão mais nova na internet; sem internet, abre a última salva.
 // - Bibliotecas do Firebase: guardadas para o app abrir mesmo sem internet.
 // - Fotos do Cloudinary: guardadas depois da 1ª vez que aparecem.
+// - Leitor de etiqueta (código 2D e leitura do nome): guardado na 1ª vez que é usado.
 // - Banco de dados (Firestore) e login: não passam por aqui (o Firebase cuida disso).
-const VERSAO = 'estoque-sm-v2';
+const VERSAO = 'estoque-sm-v3';
 const CACHE_APP = VERSAO + '-app';
 const CACHE_LIBS = 'estoque-sm-libs';
 const CACHE_FOTOS = 'estoque-sm-fotos';
@@ -52,6 +53,19 @@ self.addEventListener('fetch', e => {
       const salvo = await c.match(req);
       const rede = fetch(req).then(r => { if (r && r.ok) c.put(req, r.clone()); return r; }).catch(() => salvo);
       return salvo || rede;
+    })());
+    return;
+  }
+
+  // Leitor de etiqueta (endereços com versão fixa = nunca mudam): baixa 1 vez e usa a cópia salva
+  if (url.hostname === 'cdn.jsdelivr.net' && /^\/npm\/(zxing-wasm@|tesseract\.js@|tesseract\.js-core@|@tesseract\.js-data\/)/.test(url.pathname)) {
+    e.respondWith((async () => {
+      const c = await caches.open(CACHE_LIBS);
+      const salvo = await c.match(req);
+      if (salvo) return salvo;
+      const r = await fetch(req);
+      if (r && (r.ok || r.type === 'opaque')) c.put(req, r.clone());
+      return r;
     })());
     return;
   }
